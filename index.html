@@ -1893,7 +1893,19 @@ document.addEventListener('DOMContentLoaded', function(){
   });
 })();
 </script>
+ <script>
+  (function () {
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker
+          .register('sw.js')
+          .catch(function (err) {
+            console.warn('[SW] Registro SW fallido:', err);
+          });
+      });
+    }
+  })();
+</script>
 </body>
 </html>
-</body>
-</html>
+
