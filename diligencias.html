@@ -177,7 +177,7 @@
       <button type="button" class="nav-theme-btn" onclick="if(window.toggleCompaTheme){ window.toggleCompaTheme(); }" aria-label="Cambiar tema de color">
         🎨
       </button>
-      <a href="CompaOdac.html" class="navlink">Comparecencia y Detenidos</a>
+      <a href="index.html" class="navlink">Comparecencia y Detenidos</a>
     </nav>
   </div>
 </header>
@@ -840,7 +840,7 @@ document.querySelectorAll('.group-list .item.activa')
 // Marca retorno a ODAC (misma sesión)
 (function(){
   try{
-    const links = document.querySelectorAll('a.navlink[href="CompaOdac.html"], a.badge[href^="CompaOdac.html"]');
+    const links = document.querySelectorAll('a.navlink[href="index.html"], a.badge[href^="index.html"]');
     links.forEach(link=>{
       link.addEventListener('click',()=>{
         try{
