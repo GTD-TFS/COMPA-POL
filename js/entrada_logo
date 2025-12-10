@@ -1,0 +1,351 @@
+// COMPA · POL — Intro de logo con pantalla negra y repliegue
+(function(){
+  if (typeof document === 'undefined') return;
+
+  document.addEventListener('DOMContentLoaded', function(){
+    // Ocultar fondo marino en COMPA·POL
+    try{
+      const sea = document.getElementById('sea-bg-layer');
+      if(sea) sea.style.display = 'none';
+    }catch(_){}
+    try{
+      // Comprobar si ya hay overlay en este documento (recarga muy rápida)
+      const overlayAlreadyInDOM = !!document.getElementById('compaIntroOverlay');
+
+      // === Inyectar estilos específicos del intro ===
+      const style = document.createElement('style');
+      style.id = 'compaIntroStyles';
+      style.textContent = `
+        /* Overlay general */
+        #compaIntroOverlay{
+          position:fixed;
+          top:0;
+          left:0;
+          width:100vw;
+          height:100vh;
+          z-index:9999;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          pointer-events:auto;
+          /* Fondo negro sólido para que el cambio a COMPA se haga por fundido, no por corte */
+          background:#000000;
+          box-shadow: none;
+        }
+        /* Máscara negra que se repliega por fundido */
+        #compaIntroOverlay .compaIntroMask{
+          position:absolute;
+          top:0;
+          left:0;
+          right:0;
+          bottom:0;
+          /* Máscara negra que se repliega por fundido */
+          background:#000000;
+          transform-origin:center center;
+          z-index:1;
+        }
+        /* Contenedor del logo */
+        #compaIntroLogo{
+          position:relative;
+          z-index:2;
+          width:min(1040px, 80vw);
+          height:auto;
+          opacity:0;
+          transform:translateY(4px);
+          transition:opacity .6s ease, transform .6s ease;
+        }
+        /* SVG del logo */
+        #compaIntroLogo svg{
+          width:100%;
+          height:100%;
+          overflow:visible;
+        }
+        #compaIntroLogo text.dlp-halo{
+          fill:none;
+          stroke:#ff4b4b;
+          stroke-linecap:round;
+          stroke-linejoin:round;
+          stroke-dasharray:960;
+          stroke-dashoffset:960;
+          filter:none;
+          opacity:1;
+        }
+        #compaIntroLogo text.dlp-stroke{
+          fill:none;
+          stroke:#e9f2ff;
+          stroke-linecap:round;
+          stroke-linejoin:round;
+          stroke-dasharray:960;
+          stroke-dashoffset:960;
+          filter:none;
+        }
+        #compaIntroOverlay.ready #compaIntroLogo text.dlp-stroke{
+          animation:compa-trace 6.5s ease-in-out forwards;
+        }
+        #compaIntroOverlay.ready #compaIntroLogo text.dlp-halo{
+          animation:compa-trace 6.5s ease-in-out forwards;
+        }
+        /* Estado: logo listo para animar (después de 1s de negro) */
+        #compaIntroOverlay.ready #compaIntroLogo{
+          opacity:1;
+          transform:translateY(0);
+        }
+
+        /* Desvanecer overlay completo al final (logo incluido) */
+#compaIntroOverlay.fade-out{
+  animation:compa-overlay-fade 4.4s ease forwards;
+  pointer-events:none;
+}
+
+        @keyframes compa-trace{
+          0%{
+            stroke-dashoffset:960;
+            opacity:0;
+          }
+          10%{
+            opacity:1;
+          }
+          55%{
+            stroke-dashoffset:0;
+            opacity:1;
+          }
+          100%{
+            stroke-dashoffset:0;
+            opacity:1;
+          }
+        }
+
+        @keyframes compa-overlay-fade{
+          to{
+            opacity:0;
+          }
+        }
+      /*
+        Overlay fin de sesión común COMPA·POL
+      */
+      #compaEndOverlay{
+        position:fixed;
+        inset:0;
+        z-index:9999;
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        justify-content:center;
+        background:
+          radial-gradient(circle at 15% 0%, rgba(30,64,175,0.30) 0%, transparent 42%),
+          radial-gradient(circle at 85% 100%, rgba(185,28,28,0.28) 0%, transparent 46%),
+          radial-gradient(circle at center, #020617 0%, #020617 42%, #000000 100%);
+        box-shadow: inset 0 0 140px rgba(0,0,0,0.9);
+        color:#e5e7eb;
+        text-align:center;
+        font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;
+        opacity:0;
+        pointer-events:auto;
+        animation:compa-end-fadein .8s ease forwards;
+      }
+      #compaEndOverlay .end-logo{
+        font-weight:900;
+        font-size:42px;
+        letter-spacing:.18em;
+        text-transform:uppercase;
+        margin-bottom:10px;
+        background:linear-gradient(135deg,#ffffff 0%,#82aaff 40%,#ff4b4b 100%);
+        -webkit-background-clip:text;
+        background-clip:text;
+        color:transparent;
+        text-shadow:
+          0 0 12px rgba(255,255,255,.9),
+          0 0 30px rgba(130,170,255,.9),
+          0 0 50px rgba(255,75,75,.7);
+      }
+      #compaEndOverlay .end-sub{
+        font-size:18px;
+        opacity:.9;
+        margin-bottom:6px;
+      }
+      #compaEndOverlay .end-note{
+        font-size:13px;
+        opacity:.6;
+      }
+      @keyframes compa-end-fadein{
+        from{opacity:0;}
+        to{opacity:1;}
+      }
+      `;
+      document.head.appendChild(style);
+
+      // Activar el fondo animado
+      try{
+        document.body.classList.add('bg-ready');
+      }catch(_){}
+
+      // Decidir si debe mostrarse la intro de logo en esta página
+      let skipIntro = false;
+      try{
+        if (sessionStorage.getItem('compa_skip_intro_once') === '1'){
+          skipIntro = true;
+          sessionStorage.removeItem('compa_skip_intro_once');
+        }
+      }catch(_){}
+      const path = (window.location && window.location.pathname) || '';
+      const title = document.title || '';
+      const isCompaPage = /CompaOdac\.html$/i.test(path) || /Compa • POL/i.test(title);
+
+      // En páginas que no son COMPA, solo aplicamos el fondo (sin logo)
+      if (!isCompaPage){
+        try{ document.body.classList.add('compa-ready'); }catch(_){}
+        return;
+      }
+
+      // Si hemos marcado un salto desde diligencias, saltar intro una vez
+      if (skipIntro){
+        try{ document.body.classList.add('compa-ready'); }catch(_){}
+        return;
+      }
+
+      // Si por algún motivo ya hay overlay en DOM, no crear otro
+      if (overlayAlreadyInDOM){
+        try{ document.body.classList.add('compa-ready'); }catch(_){}
+        return;
+      }
+
+      // === Construir overlay y logo ===
+      const overlay = document.createElement('div');
+      overlay.id = 'compaIntroOverlay';
+
+      const mask = document.createElement('div');
+      mask.className = 'compaIntroMask';
+      overlay.appendChild(mask);
+
+      const logoContainer = document.createElement('div');
+      logoContainer.id = 'compaIntroLogo';
+      overlay.appendChild(logoContainer);
+
+      document.body.appendChild(overlay);
+
+      // Crear el SVG del logo COMPA·POL (similar al de DILIPOL)
+      buildCompaLogo(logoContainer);
+
+      // === Secuencia temporal ===
+      const BLACK_DELAY_MS = 50;      // 1s de pantalla negra antes de que aparezca el logo
+      const DRAW_DURATION_MS = 300;    // tiempo de dibujo del logo (igual que la animación CSS)
+      const EXTRA_HOLD_MS = 0;          // el negro se repliega justo al completar el trazo
+      const LOGO_AFTER_COLLAPSE_MS = 1000; // el logo permanece ~1s tras abrir COMPA
+
+      // 1) Tras 1s, mostrar el logo y arrancar la animación de trazado
+      setTimeout(function(){
+        overlay.classList.add('ready');
+         overlay.classList.add('reveal');
+      }, BLACK_DELAY_MS);
+
+      // 2) Cuando el logo ya se ha dibujado, empezar a difuminar la máscara negra (el logo sigue visible)
+      setTimeout(function(){
+        overlay.classList.add('reveal');
+        // Al empezar el difuminado, podemos dejar de bloquear la interacción
+        overlay.style.pointerEvents = 'none';
+      }, BLACK_DELAY_MS + DRAW_DURATION_MS + EXTRA_HOLD_MS);
+
+      // 3) Tras el repliegue y un rato con el logo visible, empezar a ceder:
+      //    primero mostramos COMPA (.compa-ready) y luego desvanecemos el overlay por completo.
+      setTimeout(function(){
+        try{
+          document.body.classList.add('compa-ready');
+        }catch(_){}
+        overlay.classList.add('fade-out');
+        setTimeout(function(){
+          try{
+            overlay.remove();
+          }catch(_){ }
+        }, 4400); // igual que la duración de la animación CSS (4.4s)
+      }, BLACK_DELAY_MS + DRAW_DURATION_MS + EXTRA_HOLD_MS + LOGO_AFTER_COLLAPSE_MS);
+
+    }catch(e){
+      console.warn('[COMPA·POL intro] error inicializando:', e);
+    }
+  });
+
+  // Construye el logo SVG COMPA·POL con efecto de trazado
+  function buildCompaLogo(root){
+    if (!root) return;
+    const NS = 'http://www.w3.org/2000/svg';
+
+    const svg = document.createElementNS(NS, 'svg');
+    svg.setAttribute('viewBox', '0 0 500 120');
+    svg.setAttribute('class', 'dlp-svg');
+
+    const glow = document.createElementNS(NS, 'text');
+    glow.setAttribute('x', '50%');
+    glow.setAttribute('y', '50%');
+    glow.setAttribute('dominant-baseline', 'middle');
+    glow.setAttribute('text-anchor', 'middle');
+    glow.setAttribute('class', 'dlp-halo');
+    glow.setAttribute('font-family', 'Impact, system-ui, -apple-system, "Segoe UI", sans-serif');
+    glow.setAttribute('font-size', '64');
+    glow.setAttribute('font-weight', '900');
+    glow.setAttribute('stroke-width', '0.10');
+    glow.textContent = 'COMPA·POL';
+    glow.style.setProperty('--delay', '0s');
+
+    const text = document.createElementNS(NS, 'text');
+    text.setAttribute('x', '50%');
+    text.setAttribute('y', '50%');
+    text.setAttribute('dominant-baseline', 'middle');
+    text.setAttribute('text-anchor', 'middle');
+    text.setAttribute('class', 'dlp-stroke');
+    text.setAttribute('font-family', 'Impact, system-ui, -apple-system, "Segoe UI", sans-serif');
+    text.setAttribute('font-size', '64');
+    text.setAttribute('font-weight', '900');
+
+    const strokeWidth = 0.12;
+    text.setAttribute('stroke-width', String(strokeWidth));
+
+    text.textContent = 'COMPA·POL';
+
+    text.style.setProperty('--delay', '0s');
+
+    svg.appendChild(glow);
+    svg.appendChild(text);
+    root.appendChild(svg);
+  }
+})();
+  // Pantalla de fin de sesión compartida para COMPA SC / ODAC
+  window.showCompaEndScreen = function(){
+    try{
+      if (document.getElementById('compaEndOverlay')) return;
+
+      const overlay = document.createElement('div');
+      overlay.id = 'compaEndOverlay';
+
+      const logo = document.createElement('div');
+      logo.className = 'end-logo';
+      logo.textContent = 'COMPA·POL';
+
+      const sub = document.createElement('div');
+      sub.className = 'end-sub';
+      sub.textContent = 'Sesión finalizada';
+
+      const note = document.createElement('div');
+      note.className = 'end-note';
+      note.textContent = 'Puede cerrar esta ventana con seguridad.';
+
+      overlay.appendChild(logo);
+      overlay.appendChild(sub);
+      overlay.appendChild(note);
+
+      document.body.appendChild(overlay);
+      document.documentElement.style.background = '#000';
+      document.body.style.background = '#000';
+    }catch(e){
+      try{
+        document.documentElement.style.background = '#000';
+        document.body.style.background = '#000';
+        document.body.innerHTML =
+          '&lt;div style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;color:#e5e7eb;font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif;text-align:center;"&gt;'
+          + '&lt;div&gt;'
+          + '&lt;div style="font-weight:900;font-size:40px;margin-bottom:8px;"&gt;COMPA·POL&lt;/div&gt;'
+          + '&lt;div&gt;Sesión finalizada&lt;/div&gt;'
+          + '&lt;/div&gt;'
+          + '&lt;/div&gt;';
+      }catch(_){}
+    }
+  };
