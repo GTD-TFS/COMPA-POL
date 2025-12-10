@@ -58,8 +58,8 @@
         }
       };
 
-  // Carpeta donde residen las plantillas ODT (carpeta hermana de /js; nombre real de carpeta: "Plantillas")
-  const BASE_PATH = 'Plantillas/';
+  // Carpeta donde residen las plantillas ODT (carpeta hermana de /js; en GitHub suele ser "plantillas")
+  const BASE_PATH = (window.ODT_PLANTILLAS_PATH || 'plantillas/');
 
   // Convierte Blob -> base64 (para alimentar JSZip.loadAsync con {base64:true})
   function blobToBase64(blob){
@@ -138,7 +138,7 @@
     }
 
     if (!Object.keys(out).length){
-      throw new Error('No se pudieron cargar plantillas ODT/JS. Comprueba los <script src="js/plantilla_*.js"> o ajusta BASE_PATH.');
+      throw new Error('No se pudieron cargar plantillas ODT/JS. Comprueba los <script src="js/plantilla_*.js">, la carpeta "plantillas/" en la raíz, o ajusta BASE_PATH.');
     }
     window.PLANTILLAS = Object.assign({}, out);
   }
