@@ -169,7 +169,7 @@
   <header class="site-header">
   <div class="header-inner">
     <div class="brand" style="display:flex;gap:10px;align-items:center;color:#e0e0e0;">
-      <a href="index.html?quickMenu=1" class="badge" style="text-decoration:none;display:inline-block;color:#e0e0e0;">COMPA • POL</a>
+      <a href="Compaodac.html?quickMenu=1" class="badge" style="text-decoration:none;display:inline-block;color:#e0e0e0;">COMPA • POL</a>
       <h1 style="font-size:16px;margin:0;letter-spacing:.4px;color:#bbb"> Diligencias y Documentos</h1>
     </div>
     <div id="headerMeta" class="header-meta" style="display:none;"></div>
@@ -177,7 +177,7 @@
       <button type="button" class="nav-theme-btn" onclick="if(window.toggleCompaTheme){ window.toggleCompaTheme(); }" aria-label="Cambiar tema de color">
         🎨
       </button>
-      <a href="index.html" class="navlink">Comparecencia y Detenidos</a>
+      <a href="Compaodac.html" class="navlink">Comparecencia y Detenidos</a>
     </nav>
   </div>
 </header>
@@ -840,7 +840,7 @@ document.querySelectorAll('.group-list .item.activa')
 // Marca retorno a ODAC (misma sesión)
 (function(){
   try{
-    const links = document.querySelectorAll('a.navlink[href="index.html"], a.badge[href^="index.html"]');
+    const links = document.querySelectorAll('a.navlink[href="Compaodac.html"], a.badge[href^="Compaodac.html"]');
     links.forEach(link=>{
       link.addEventListener('click',()=>{
         try{
