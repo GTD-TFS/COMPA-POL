@@ -1,7 +1,7 @@
 {
   "name": "COMPA·POL",
   "short_name": "COMPA·POL",
-  "start_url": "./index.html",
+  "start_url": "./Compapol.html",
   "display": "standalone",
   "background_color": "#000000",
   "theme_color": "#0e1f47",
@@ -12,7 +12,7 @@
       "type": "image/png"
     },
     {
-      "src": "icons/icon-512.png",
+      "src": "icons/icon-192.png",
       "sizes": "512x512",
       "type": "image/png"
     }
