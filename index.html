@@ -1,0 +1,1897 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Compa • POL</title>
+<link rel="stylesheet" href="compa_theme.css" />
+
+<style>
+ 
+  /* Fondo definitivo solo cuando entrada_logo marca .compa-ready */
+  body::before{content:"";position:fixed;inset:0;background:rgba(0,0,0,0);z-index:-1;pointer-events:none;}
+
+  /* Ocultar cabecera y contenido hasta que la intro marque listo */
+  body:not(.compa-ready) header,
+  body:not(.compa-ready) .wrap{
+    visibility:hidden;
+  }
+  body.drogas-open{filter:none!important;}
+
+  /* Selects en modal DROGAS (forzar fondo oscuro en Windows) */
+  body.drogas-open select,
+  body.drogas-open select option{
+    background-color:#020617 !important;
+    color:#f9fafb !important;
+  }
+
+
+.wrap{max-width:1480px;margin:26px auto 8px;padding:0 50px 18px;display:grid;grid-template-columns:1.3fr .7fr;gap:16px;}
+  @media (max-width:1000px){.wrap{grid-template-columns:1fr;}}
+
+  .card{background:rgba(0,0,0,0);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;}
+  /* Panel filiaciones con borde y sombra del editor */
+  #panel-filiaciones{
+    border:1px solid var(--glass-edge);
+    box-shadow:var(--shadowA);
+  }
+  .card .head{padding:12px 14px 0;}
+  .card .body{padding:12px 14px 16px;}
+  h2{margin:0 0 10px;color:var(--text)}
+
+
+  .btn:active{
+    transform:translateY(0);
+    box-shadow:0 0 34px rgba(255,255,255,.55);}
+  .btn.secondary{background:rgba(246, 0, 0, 0.579);color:var(--text);border:1px solid var(--border);box-shadow:none;}
+  .btn.secondary:hover{box-shadow:0 0 14px rgba(231, 235, 0, 0.957);}
+  .btn.success{background:inear-gradient(60deg,
+      rgba(0, 244, 159, 0.05),
+      rgba(0, 255, 140, 0.5));color:#0b8a62;}
+  .btn.danger{background:linear-gradient(135deg,#f30505,#160d0d);color:#2b0f0f;}
+  .btn.ghost{background:transparent;color:var(--muted);border:1px dashed var(--border);}
+  .btn.tiny{font-size:13px;padding:6px 9px;border-radius:10px;min-height:auto;}
+  .btn.btn-tramites{
+    background: transparent;
+    border:1px solid rgba(34,197,94,0.35) !important;
+    box-shadow:none;
+    color:#ecfdf5;
+    letter-spacing:0.3px;
+    font-weight:700;
+    transition:box-shadow .2s ease, background .2s ease, transform .2s ease;
+  }
+  .btn.btn-tramites:hover{
+    border-color: rgba(34,197,94,0.85) !important;
+    box-shadow:0 0 8px rgba(22,163,74,0.45);
+    transform:translateY(-1px);
+  }
+  .btn.btn-tramites:active{
+    background: radial-gradient(circle at 50% 0%, rgba(34,197,94,0.35), rgba(5,46,22,0.95));
+    border-color: rgba(34,197,94,0.85) !important;
+    box-shadow:
+      0 0 4px rgba(16,185,129,0.9),
+      0 0 12px rgba(22,163,74,0.7) inset;
+    transform:translateY(0);
+  }
+  /* Glow interno y externo al pulsar copiar */
+  #copyBtn:active{
+    background: rgba(120,180,255,.25) !important;
+    box-shadow: 0 0 18px rgba(120,180,255,.85), 0 0 32px rgba(120,180,255,.65) inset !important;
+    transform: scale(0.96);}
+  .btn-row{display:flex;gap:8px;flex-wrap:wrap;}
+  #dashBtn{background:transparent;color:#eafcff;border:1px solid rgba(100,220,255,.4);box-shadow:0 0 0 1px rgba(100,220,255,.18) inset,
+              0 6px 22px rgba(100,220,255,.18),
+              0 0 22px rgba(100,220,255,.12);
+  text-shadow:0 0 7px rgba(100,220,255,.28);transition: box-shadow .25s ease, transform .25s ease;}
+  #dashBtn:hover{
+  transform:translateY(-1px);box-shadow:0 0 15px rgba(100,220,255,.6), 0 10px 30px rgba(100,220,255,.4);}
+  
+  .btn-save{
+    background:transparent;
+    border:none !important;
+    color:#eaf3ff;
+    box-shadow:0 0 5px rgba(247, 132, 0, 0.355);
+    text-shadow:0 0 5px rgb(240, 86, 9, 0.35);
+    transition:box-shadow .25s ease, transform .25s ease;
+  }
+  
+  #saveProjectBtn {
+    background: linear-gradient(60deg,
+      rgba(244, 146, 0, 0.05),
+      rgba(255, 123, 0, 0.2));
+    border: none !important;
+    color: #ffffff !important;
+    border-radius: 8px;
+    padding: 6px 10px !important;
+    font-weight: 700;
+    min-height: 32px !important;
+    height: 32px !important;
+    cursor: pointer;
+    transition: box-shadow .25s ease, transform .25s ease;
+  }
+
+  #saveProjectBtn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 0 30px rgb(247, 115, 80, .85);
+  }
+
+  /* botones extra (eléctricos) */
+  #addFBtn{
+    background:transparent;
+    border:none !important;
+    color:#ffffff;
+    box-shadow:0 0 20px rgba(2,207,81,.75);
+    text-shadow:0 0 7px rgba(74, 234, 21, 0.55);
+  }
+  #addFBtn:hover{
+    box-shadow:0 0 30px rgba(3, 141, 58, 0.85);
+  }
+  #importJsonBtn{
+    background:transparent;
+    border:none !important;
+    color:#ffffff;
+    box-shadow:0 0 20px rgba(255,224,102,.75);
+    text-shadow:0 0 7px rgba(255,224,102,.45);
+  }
+  #importJsonBtn:hover{
+    box-shadow:0 0 30px rgba(255,224,102,.95);
+  }
+  #addObjBtn{
+    background:transparent;
+    border:none !important;
+    color:#eafcff;
+    box-shadow:0 0 20px rgba(63,138,229,.75);
+    text-shadow:0 0 7px rgba(120,180,255,.28);
+  }
+  #addObjBtn:hover{
+    box-shadow:0 0 30px rgba(77, 150, 238, 0.85);
+  }
+  #saveObjBtn {
+    color: rgb(255, 242, 0) !important;   /* el color que quieras */
+    font-weight: 600;        /* opcional */
+}
+  #openColetillasBtn{
+    background:transparent;
+    border:none !important;
+    color:#fff;
+    box-shadow:0 0 14px rgba(200,220,255,.35);
+  }
+  #openColetillasBtn:hover{
+    box-shadow:0 0 30px rgba(200,220,255,.85);
+  }
+  #exportPrometeoBtn{
+    background:transparent !important;
+    border:none !important;
+    color:#f08a05 !important;
+    box-shadow:0 0 14px rgba(255,120,80,.65) !important;
+    text-shadow:0 0 8px rgba(255,150,120,.65) !important;
+  }
+  #exportPrometeoBtn:hover{
+    box-shadow:0 0 34px rgba(255,120,80,.85) !important;
+  }
+  #exitBtn{
+  background: linear-gradient(90deg,
+    rgba(237, 13, 13, 0.10),
+    rgba(229, 237, 13, 0.15));
+  border:none !important;
+  color:#ffe5e5;
+  border-radius:8px;
+  box-shadow: 0 0 4px rgba(229,237,13,0.35);
+}
+  #exitBtn:hover{
+    box-shadow:0 0 24px rgb(238, 254, 80, .85);
+  }
+
+  label{display:block;font-size:12px;color:var(--muted);margin:2px 0 6px;}
+  input,select{width:100%;background:rgba(255,255,255,.10);color:var(--text);border:1px solid var(--border);border-radius:10px;font:inherit;height:40px;padding:8px 10px;outline:none;}
+  #panel-filiaciones input,
+  #panel-filiaciones select{
+    height:32px;
+    padding-top:4px;
+    padding-bottom:4px;
+  }
+  input:focus,select:focus{border-color:rgba(124,156,255,.6);box-shadow:0 0 0 3px rgba(124,156,255,.25);}
+  select{background:rgba(255,255,255,.18)!important;color:#fff!important;border:1px solid rgba(255,255,255,.35)!important;border-radius:8px!important;appearance:auto!important;-webkit-appearance:menulist!important;}
+  select option{background:#0f1221!important;color:#fff!important;}
+
+  .editor{
+      border-radius:20px;
+      background: rgba(0,0,0,0.08);
+      border:1px solid var(--glass-edge);
+      box-shadow:var(--shadowA), inset 0 1px 6px var(--shine);
+      min-height:70vh;
+      padding:16px 18px;
+      overflow-y:auto;
+      overflow-x:hidden;
+      white-space:pre-wrap;
+      font-family:"Times New Roman",Times,serif;
+      font-size:19px;
+      line-height:1.6;
+  }
+  .editor p,.editor div{margin:0}
+  .editor *{font:inherit!important;color:inherit!important;line-height:inherit!important;}
+
+  details{background:rgba(0,0,0,0);border:1px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden;}
+  summary{list-style:none;position:relative;padding:10px 42px 10px 10px;cursor:pointer;user-select:none;display:flex;align-items:center;gap:10px;}
+  summary::-webkit-details-marker{display:none;}
+  .tag{font-size:12px;color:#0b0d19;background:linear-gradient(135deg,var(--accent),var(--accent-2));padding:3px 8px;border-radius:999px;font-weight:900;box-shadow:0 6px 16px rgba(124,156,255,.35);}
+  .tag-det{
+    background:linear-gradient(135deg,var(--danger),#b30000);
+    color:#ffffff;
+    box-shadow:0 6px 16px rgba(255,0,0,.45);
+  }
+  .summary-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
+  .docmeta{font-size:12px;color:var(--muted)}
+  .caret{margin-left:6px;width:14px;height:14px;border:solid rgba(157,124,255,.9);border-width:0 2px 2px 0;display:inline-block;padding:3px;transform:rotate(0deg);transition:transform .2s ease;}
+  details[open] summary .caret{transform:rotate(45deg);}
+  .details-body{padding:10px;border-top:1px solid var(--border);background:rgba(0,0,0,.12);}
+
+  .fmtbar{display:flex;gap:6px;justify-content:flex-end;margin:6px 0 8px;}
+  .fmtbar button.active{box-shadow:0 0 6px rgba(124,156,255,.8), inset 0 0 4px rgba(157,124,255,.8);}
+
+#pdfImportSlot button{
+    background: linear-gradient(90deg,
+    rgba(237, 11, 11, 0.10),
+    rgba(237, 11, 11, 0.2)
+  );
+  border:none !important;
+  color:#f8f5f5;
+  border-radius:8px;
+  padding:6px 10px;
+  font-weight:700;
+  min-height:32px;
+  box-shadow:0 0 9px rgba(237, 8, 8, 0.35);
+  text-shadow:0 0 9px rgba(231, 42, 42, 0.34);
+  cursor:pointer;
+  transition:box-shadow .25s ease, transform .25s ease;
+}
+ #pdfImportSlot button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 30px rgba(236, 0, 0, 0.943);
+}
+
+#saveProjectBtn,
+#loadProjectBtn,
+#exitBtn,
+#exportPrometeoBtn {
+  min-height: 32px !important;
+  height: 32px !important;
+  padding: 6px 10px !important;
+  font-size: 12px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
+  line-height: 1 !important;
+}
+
+/* Botones principales ocultos: controlados desde el menú rápido */
+#saveProjectBtn,
+#pdfImportSlot,
+#loadProjectBtn,
+button[id="loadProjectBtn"],
+#exitBtn,
+#panel-documento .head button.btn-load {
+  display: none !important;
+}
+#pdfImportSlot button:active{
+  transform:translateY(0);
+  box-shadow:0 0 34px rgba(242, 56, 56, 0.9);
+}
+
+#loadProjectBtn {
+  min-height: 32px !important;
+  height: 32px !important;
+  padding: 6px 10px !important;
+    background: linear-gradient(90deg,
+    rgba(0, 144, 0, 0.10),
+    rgba(0, 119, 0, 0.30));
+  border: none !important;
+  color: #f9f9f9 !important;
+  border-radius: 8px;
+  font-weight: 700;
+  text-shadow: 0 0 9px rgba(1, 96, 1, 0.4);
+  cursor: pointer;
+  transition: box-shadow .25s ease, transform .25s ease;
+  box-shadow:0 0 16px rgb(13, 131, 0, 0.35);
+  text-shadow:0 0 10px rgba(16, 122, 2, 0.347);
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
+  line-height: 1 !important;
+}
+
+#loadProjectBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 30px rgba(47, 210, 47, 0.95);
+}
+
+#loadProjectBtn:active {
+  transform: translateY(0);
+  box-shadow: 0 0 34px rgba(32, 236, 32, 0.9);
+}
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:50;}
+  .modal.show{display:flex;}
+  .modal .panel{width:min(720px,94vw);max-height:85vh;overflow:auto;background:rgba(0,0,0,0.68);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);}
+  .modal .panel .head{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-bottom:1px solid var(--border);}
+  .modal .panel .body{padding:12px;}
+  .coletilla{display:flex;justify-content:space-between;background:rgba(255,255,255,.10);border:1px solid var(--border);border-radius:10px;padding:10px;margin-bottom:8px;}
+
+  #panel-documento .body{display:flex;flex-direction:column;}
+  #doc.editor{max-height:calc(100vh - 300px);overflow:auto;overscroll-behavior:contain;}
+  @media (max-height:760px){#doc.editor{max-height:calc(100vh - 240px);}}
+/* Azul marino leve solo para el editor (no inputs) */
+
+  .split-btn-wrap{
+  display:inline-block;
+  position:relative;
+}
+
+.btn.tools-parent{
+  background:transparent;
+  padding:8px 14px;
+  font-size:18px;
+  border-radius:10px;
+  border:none;
+  cursor:pointer;
+  color:#eafcff;
+  box-shadow:0 0 14px rgba(100,220,255,.55);
+  text-shadow:0 0 7px rgba(100,220,255,.55);
+  transition:.25s ease;
+}
+
+.btn.tools-parent:hover{
+  transform:translateY(-1px);
+  box-shadow:0 0 22px rgba(100,220,255,.85);
+}
+
+.tools-split{
+  display:flex;
+  overflow:hidden;
+  border-radius:10px;
+  transform-origin:center;
+  transform:scaleX(0);
+  transition:transform .25s ease;
+  box-shadow:0 0 18px rgba(100,220,255,.45);
+}
+
+.tools-split .btn{
+  flex:1 1 0;
+  background:transparent;
+  border:none;
+  padding:8px 10px;
+  cursor:pointer;
+  color:#cfeaff;
+  text-shadow:0 0 5px rgba(120,180,255,.45);
+  transition:.25s ease;
+}
+
+.split-left:hover,
+.split-right:hover{
+  box-shadow:0 0 22px rgba(100,220,255,.85) inset;
+}
+
+.tools-split.show{
+  transform:scaleX(1);
+}
+
+.hidden{
+  display:none;
+}
+.det-ext-label,
+#panel-filiaciones label {
+    font-weight: 600;
+    color: var(--label-accent);
+    background: none;
+    -webkit-background-clip: unset;
+    background-clip: unset;
+}
+.det-ext-field{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-align:center;
+}
+
+.det-ext-label{
+  text-align:center;
+}
+
+.det-ext-input{
+  text-align:center;
+  background:transparent;
+  border:1px solid rgba(148,163,184,.6);
+  color:inherit;
+}
+.det-meta-red{
+    background:rgba(15,23,42,.90);
+    border:1px solid rgba(239,68,68,.6);
+    box-shadow:
+        0 0 10px rgba(239,68,68,.35),
+        inset 0 0 0 rgba(239,68,68,0);
+    color:#fca5a5;
+}
+</style>
+</head>
+
+<body>
+<header class="header" style="background:rgba(0,0,0,0.35); backdrop-filter:blur(6px);">
+  <div class="header-inner">
+    <div class="badge brand" style="color:#e0e0e0;">
+      COMPA • POL
+      <!-- If there is an <h1> here, update its color below -->
+    </div>
+    <div class="title">Comparecencia y Detenidos</div>
+    <div id="headerMeta" class="header-meta" style="display:none;"></div>
+    <nav class="top-nav" aria-label="Navegación principal" style="margin-left:auto;">
+      <button type="button" class="nav-theme-btn" onclick="if(window.toggleCompaTheme){ window.toggleCompaTheme(); }" aria-label="Cambiar tema de color">
+        🎨
+      </button>
+      <a href="diligencias.html">Diligencias y Documentos</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+  <section class="card" id="panel-documento">
+    <div class="head">
+      <div class="btn-row">
+        <button class="btn tiny" id="copyBtn" style="padding:6px 10px; border-radius:12px; min-height:32px; height:32px; color:#ffe066; background:transparent; box-shadow:0 0 8px rgba(120,180,255,.55); margin-right:8px;">C</button>
+        <div class="split-btn-wrap" style="margin-right:8px;">
+          <button id="btnTools" class="btn tools-parent" style="padding:6px 10px; border-radius:12px; min-height:32px; height:32px; color:#eafcff; background:transparent; box-shadow:0 0 8px rgba(100,220,255,.55); text-shadow:0 0 7px rgba(100,220,255,.55);">✏️</button>
+          <div id="toolsSplit" class="tools-split hidden">
+            <button class="btn split-left" id="childDash">Guiones</button>
+            <button class="btn split-right" id="childCol">Coletillas</button>
+          </div>
+        </div>
+        <button class="btn btn-save" id="saveProjectBtn">Guardar proyecto</button>
+        <div id="pdfImportSlot" style="margin-top:0; margin-left:0;"></div>
+        <input type="file" id="loadProjectInput" accept="application/json" style="display:none" />
+        <button class="btn btn-load" id="loadProjectBtn">Cargar parte</button>
+        <button class="btn" id="exitBtn">Salir</button>
+        <button class="btn" id="exportPrometeoBtn" style="margin-left:auto;">⚡ Exportar a Prometeo</button>
+      </div>
+    </div>
+    <div class="body">
+      <label for="doc"></label>
+      <div id="doc" class="editor" contenteditable="true"></div>
+    </div>
+  </section>
+
+  <section class="card" id="panel-filiaciones">
+    <div class="head" style="
+  text-align:center;
+  padding:10px 0;
+  background:transparent;
+  border:none;
+  box-shadow:none;
+">
+  <h2 style="margin:0; font-weight:900; font-size:22px; letter-spacing:1px; color:#ffffff; text-shadow:none;">
+    
+  </h2>
+</div>
+    <div class="body">
+      <div class="btn-row" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+        <button class="btn secondary" id="importJsonBtn">👤⛓️DETENIDO</button>
+        <button class="btn secondary" id="addFBtn">👤 Filiación</button> 
+        <button class="btn secondary" id="addObjBtn">🧰 Objetos</button>
+        <input id="importJsonInput" type="file" accept=".json" multiple style="display:none" />
+      </div>
+      <div id="filiaciones" style="margin-top:14px;"></div>
+  <p id="emptyHint" class="muted tiny" style="display:none; font-size:10px;">Sin filiaciones</p>
+    </div>
+  </section>
+</div>
+
+<!-- Modal Coletillas -->
+<div class="modal" id="coletillasModal" aria-hidden="true">
+  <div class="panel" role="dialog" aria-modal="true" aria-labelledby="coletillasTitle">
+    <div class="head">
+      <strong id="coletillasTitle">Coletillas predeterminadas</strong>
+      <button class="btn ghost tiny" id="closeColetillasBtn">✕ Cerrar</button>
+    </div>
+    <div class="body"><div class="coletillas" id="coletillasList"></div></div>
+  </div>
+</div>
+<datalist id="listaPaises"></datalist>
+<script src="js/paises.js"></script>
+<script src="js/provincias_es.js"></script>
+<script src="js/municipios.js"></script>
+<script src="js/calles.js"></script>
+<script src="Plantillas/plantilla_amarillas.js"></script>
+<script src="Plantillas/plantilla_azules.js"></script>
+<script src="Plantillas/plantilla_derechos_espanol.js"></script>
+<script src="Plantillas/plantilla_derechos_ingles.js"></script>
+<script src="Plantillas/plantilla_derechos_arabe.js"></script>
+<script src="Plantillas/plantilla_derechos_italiano.js"></script>
+<script src="Plantillas/plantilla_derechos_ruso.js"></script>
+<script src="Plantillas/plantilla_fax.js"></script>
+<script src="js/odt_zip.js"></script>
+<script>
+  document.addEventListener('focusin', function(e){
+    const t = e.target;
+    if (!t || t.getAttribute('list') !== 'listaPaises') return;
+
+    const dl = document.getElementById('listaPaises');
+    if (!dl || (dl.children && dl.children.length > 0) || !window.PAISES) return;
+
+    try{
+      const base = (window.PAISES.featured || []).concat(
+        window.PAISES.groups ? window.PAISES.groups.flatMap(function(g){ return g.items || []; }) : []
+      );
+      dl.innerHTML = base.map(function(p){
+        return '<option value="'+p+'"></option>';
+      }).join('');
+    }catch(_){}
+  });
+</script>
+<script>
+/* limpieza total */
+window.fullCleanup = function(){
+  window.__EXITING_APP = true;
+  try{
+    const KEYS=['proyecto','expedienteGuardado','expedienteOriginal','gestor_partes_comparecencias_pc_v3','expediente.v1','odac_diligencias_html','archivoAbiertoNombre','expedienteDirty','expedienteAbierto'];
+    KEYS.forEach(k=>{try{localStorage.removeItem(k)}catch{}})
+    try{Object.keys(localStorage).filter(k=>/^(expediente|gestor_|odac_)/.test(k)).forEach(k=>{try{localStorage.removeItem(k)}catch{}})}catch{}
+  }catch{}
+  try{
+    if(window.state){window.state.doc='';window.state.filiaciones=[];window.state.objects=[];window.state.diligencias='';}
+  }catch{}
+  try{
+    const ed=document.getElementById('doc');if(ed) ed.innerHTML='';
+    const cont=document.getElementById('filiaciones');if(cont) cont.innerHTML='';
+    const hint=document.getElementById('emptyHint');if(hint) hint.style.display='';
+  }catch{}
+};
+
+/* utilidades básicas */
+const $=s=>document.querySelector(s);
+const $$=s=>Array.from(document.querySelectorAll(s));
+function debounce(fn,wait=800){let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>fn(...a),wait)}}
+const saveDebounced=debounce(()=>save(),800);
+const saveDocDebounced=debounce(()=>save(),1200);
+
+/* estado principal */
+let openedIndex=-1,savedRange=null;
+const state={
+  filiaciones:[],
+  titulo:"",
+  doc:"",
+  nextId:1,
+  objects:[],
+  "Juzgado":"",
+  "Fecha de procedimiento":"",
+  "Hora de procedimiento":"",
+  "Abogado nombre":"",
+  "Abogado colegiado":""
+};
+window.state = state;
+const LS_KEY="gestor_partes_comparecencias_pc_v3";
+
+function fillHeaderMeta(){
+  try{
+    const slot = document.getElementById('headerMeta');
+    if (!slot) return;
+
+    const raw = localStorage.getItem(LS_KEY);
+    if (!raw) return;
+
+    const data = JSON.parse(raw);
+    const root = (data && typeof data === 'object' && (data.expediente || data)) || {};
+    const fils =
+      Array.isArray(root.filiaciones) ? root.filiaciones :
+      (Array.isArray(root.data && root.data.filiaciones) ? root.data.filiaciones : []);
+
+    if (!fils || !fils.length) return;
+
+    const det = fils.find(f =>
+      /detenid/i.test(String(f["Condición"] || f["Condicion"] || ""))
+    );
+    if (!det) return;
+
+    const numDil =
+      det["Diligencias"] ||
+      det["Nº diligencias"] ||
+      det["Número de diligencias"] ||
+      det["Numero diligencias"] ||
+      det["n_diligencias"] ||
+      det["num_diligencias"] ||
+      "";
+
+    const delito =
+      det["Delito"] ||
+      det["DELITO"] ||
+      det["Delito principal"] ||
+      det["delito"] ||
+      "";
+
+    if (!numDil && !delito) return;
+
+    const parts = [];
+    if (numDil) parts.push("DILIGENCIAS " + String(numDil));
+    if (delito) parts.push(String(delito));
+
+    slot.textContent = parts.join(" · ");
+    slot.style.display = "inline-flex";
+  }catch(_){}
+}
+
+/* persistencia simple */
+function save(){
+  if(window.__EXITING_APP) return;
+  try{
+    localStorage.setItem(LS_KEY, JSON.stringify(state));
+    if (typeof fillHeaderMeta === 'function') fillHeaderMeta();
+  }catch(_){}
+}
+function load(){const s=localStorage.getItem(LS_KEY);if(s){try{Object.assign(state,JSON.parse(s))}catch{}}}
+window.save=save;window.LS_KEY=LS_KEY;
+
+/* guardia sesión anterior */
+document.addEventListener('DOMContentLoaded',()=>{
+  try{
+   
+    if(typeof load==='function') load();
+    fillHeaderMeta();
+
+    // Rehidratar editor con el estado y guardar al escribir
+    try{
+      const ed = document.getElementById('doc');
+      if(ed){
+        // Pinta lo que hubiera guardado
+        setDocHTML(state.doc || '');
+        // Guarda mientras escribes
+        ed.addEventListener('input', ()=>{
+          try{ state.doc = getDocHTML(); saveDocDebounced(); }catch{}
+        });
+        ed.addEventListener('blur', ()=>{
+          try{ state.doc = getDocHTML(); save(); }catch{}
+        });
+      }
+    }catch{}
+
+    // Guardar al navegar hacia Diligencias (mismo tab) SIN limpiar expediente
+try{
+  const link = document.querySelector('nav.top-nav a[href="diligencias.html"]');
+  if(link){
+    link.addEventListener('click', ()=>{
+      try{
+        // Marcamos navegación interna para que beforeunload NO haga fullCleanup
+        window.__SKIP_FULL_CLEANUP_ON_UNLOAD = true;
+        state.doc = getDocHTML();
+        save();
+      }catch(_){}
+    });
+  }
+}catch(_){}
+
+   // Limpiar al cerrar/recargar la pestaña (como si pulsaras Salir),
+// pero NO cuando navegamos internamente a Diligencias en este mismo tab.
+try{
+  window.addEventListener('beforeunload', ()=>{
+    try{
+      // Si venimos de un click interno a Diligencias, NO limpies nada
+      if (window.__SKIP_FULL_CLEANUP_ON_UNLOAD) return;
+
+      if(typeof window.fullCleanup === "function"){
+        window.fullCleanup();
+      }else{
+        try{ localStorage.removeItem(LS_KEY); }catch(_){}
+      }
+    }catch(_){}
+  });
+}catch{}
+  }catch{}
+});
+
+/* descarga con merge dils */
+async function download(filename,data,type="application/json"){
+  try{
+    if((type||'').includes('json')&&typeof data==='string'){
+      const dils=localStorage.getItem('odac_diligencias_html')||'';
+      try{const o=JSON.parse(data);if(o&&typeof o==='object'){if(!('diligenciasHtml'in o)||!o.diligenciasHtml){o.diligenciasHtml=dils}data=JSON.stringify(o,null,2)}}catch{}
+    }
+  }catch{}
+  try{
+    if(window.showSaveFilePicker){
+      const handle=await window.showSaveFilePicker({suggestedName:filename,types:[{description:"Archivo JSON",accept:{"application/json":[".json"]}}]});
+      const w=await handle.createWritable();await w.write(new Blob([data],{type}));await w.close();alert("Proyecto guardado.");return;
+    }
+  }catch(e){if(e&&e.name==="AbortError") return;console.warn("showSaveFilePicker fallback:",e)}
+  const name=prompt("Nombre del archivo:",filename)||filename;
+  const blob=new Blob([data],{type});const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(url);a.remove()},0);
+}
+
+/* helpers texto */
+function escapeHtml(s){return (s??"").replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+const STOPWORDS=new Set(["y","e","o","u","de","del","la","las","el","los","al","a","ante","bajo","cabe","con","contra","desde","en","entre","hacia","hasta","para","por","según","sin","so","sobre","tras"]);
+function titleCasePreservingEdges(str){if(str==null)return"";const lead=(str.match(/^\s+/)||[""])[0];const trail=(str.match(/\s+$/)||[""])[0];const core=str.replace(/^\s+|\s+$/g,"");if(core==="")return lead+trail;const words=core.split(/\s+/);const mapped=words.map((w,idx)=>{const lower=w.toLowerCase();if(idx>0&&STOPWORDS.has(lower))return lower;return lower.split(/([-’'–—])/u).map((seg,j)=>{if(j%2===1)return seg;if(!seg)return seg;return seg.charAt(0).toUpperCase()+seg.slice(1)}).join("")}).join(" ");return lead+mapped+trail}
+const toUpper=s=>(s||"").toUpperCase();
+function formatFechaLikeDDMMYYYY(input){const digits=(input||"").replace(/\D/g,"").slice(0,8);const d=digits.slice(0,2),m=digits.slice(2,4),y=digits.slice(4,8);let out=d;if(m.length) out+="/"+m;if(y.length) out+="/"+y;return out}
+
+// Helpers para conversión de fechas entre dd/mm/aaaa y yyyy-mm-dd
+function toDateInputValue(input){
+  const v = (input || "").trim();
+  if (!v) return "";
+  // Ya en formato ISO
+  if (/^\d{4}-\d{2}-\d{2}$/.test(v)) return v;
+  // Admitir dd/mm/aaaa o dd-mm-aaaa
+  const m = v.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/);
+  if (m){
+    const d = m[1].padStart(2,"0");
+    const mo = m[2].padStart(2,"0");
+    const y = m[3];
+    return `${y}-${mo}-${d}`;
+  }
+  return "";
+}
+function fromDateInputValue(input){
+  const v = (input || "").trim();
+  if (!v) return "";
+  const m = v.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (m){
+    const y = m[1];
+    const mo = m[2].padStart(2,"0");
+    const d = m[3].padStart(2,"0");
+    return `${d}/${mo}/${y}`;
+  }
+  // Si viene en otro formato, lo dejamos tal cual para no romper rehidratado antiguo
+  return v;
+}
+
+/* normalizar doc */
+function normalizeTipoDoc(v){
+  if (v == null) return "";
+  const raw = String(v).trim();
+  const lower = raw.toLowerCase();
+  const norm = raw
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+
+  // DNI / Documento Nacional de Identidad
+  if (norm.includes("dni") || norm.includes("documento nacional de identidad")) {
+    return "DNI";
+  }
+  // NIE
+  if (norm.includes("nie")) {
+    return "NIE";
+  }
+  // Pasaporte
+  if (norm.includes("pasap")) {
+    return "Pasaporte";
+  }
+  // Carta Nacional de Identidad (CNI, variantes)
+  if (norm.includes("carta nacional") || norm === "cni") {
+    return "Carta Nacional de Identidad";
+  }
+
+  // Indocumentado/a y variantes
+  if (
+    norm === "indocumentado" ||
+    norm === "indocumentada" ||
+    norm === "indocumentado/a" ||
+    norm === "indocumentada/o" ||
+    norm === "indoc" ||
+    norm === "no documentado" ||
+    norm === "no documentada" ||
+    norm === "sin documentacion" ||
+    norm === "sin documentacion" // sin tilde
+  ) {
+    // Valor neutro por defecto; el usuario puede ajustar a Indocumentada en la ficha
+    return "Indocumentado";
+  }
+
+  // Otros documentos de identidad
+  if (
+    norm === "otro" ||
+    norm === "otro documento" ||
+    norm.includes("otro documento de identidad")
+  ) {
+    return "Otro documento de Identidad";
+  }
+
+  return raw;
+}
+/* normalizar sexo */
+function normalizeSexo(v){if(v==null)return"";const s=String(v).trim().toLowerCase();
+  if(/^(hombre|masculino|m|h|male|varón|varon)$/.test(s))return"Hombre";
+  if(/^(mujer|femenino|f|female)$/.test(s))return"Mujer";
+  if(v==="Hombre"||v==="Mujer")return v;return"";}
+/* titlecase excepto */
+function normalizeFiliacionTitleCaseExcept(f){if(!f)return f;const EXCEPT=new Set(["Tipo de documento","Apellidos","Nº Documento"]);for(const k in f){if(!Object.prototype.hasOwnProperty.call(f,k))continue;const v=f[k];if(typeof v==="string"&&!EXCEPT.has(k)){f[k]=titleCasePreservingEdges(v)}}return f}
+/* id disponible */
+function nextAvailableId(){const used=new Set((state.filiaciones||[]).map(f=>f.fixedId).filter(x=>Number.isInteger(x)&&x>0));let id=1;while(used.has(id))id++;return id}
+/* nueva filiación */
+function nuevaFiliacion(){
+  return {
+    "Nombre":"",
+    "Apellidos":"",
+    "Tipo de documento":"",
+    "Otro documento":"",
+    "Nº Documento":"",
+    "Nacionalidad":"",
+    "Fecha de nacimiento":"",
+    "Lugar de nacimiento":"",
+    "Nombre de los Padres":"",
+    "Domicilio":"",
+    "Teléfono":"",
+    "Sexo":"",
+    "Condición":"",
+    "Condición (otro)":"",
+    "fixedId":nextAvailableId()
+  }
+}
+
+/* editor helpers */
+function editorEl(){return $('#doc')}
+function getDocHTML(){return editorEl().innerHTML}
+function setDocHTML(h){editorEl().innerHTML=h||""}
+function editorFocus(){editorEl().focus()}
+function saveEditorSelection(){const sel=window.getSelection?.();const ed=editorEl();if(!sel||sel.rangeCount===0)return;const r=sel.getRangeAt(0);if(!ed.contains(r.startContainer))return;savedRange=r.cloneRange()}
+document.addEventListener('selectionchange',saveEditorSelection);
+
+function prefixParagraphs(){
+  const box = editorEl();
+  if(!box) return;
+
+  // Asegurar prefijo al inicio absoluto si el texto visible no empieza por "-- "
+  const startTxt = (box.innerText||'').replace(/^\s+/, '');
+  if (startTxt && !/^--\s/.test(startTxt)){
+    box.insertBefore(document.createTextNode('-- '), box.firstChild);
+  }
+
+  // Si hay bloques (P, DIV, etc.), prefijar en cada uno con contenido no vacío
+  const blocks = Array.from(box.childNodes).filter(n =>
+    n && n.nodeType === 1 && /^(P|DIV|BLOCKQUOTE|LI|H1|H2|H3|H4|H5|H6)$/i.test(n.tagName)
+  );
+
+  if (blocks.length){
+    blocks.forEach((el, i) => {
+      const raw = (el.textContent||'');
+      const txt = raw.replace(/^\s+/, '');
+      if (!/\S/.test(txt)) return;               // vacío → saltar
+      if (i === 0 && /^--\s/.test(startTxt)) return; // el primero ya tiene prefijo global
+      if (/^--\s/.test(txt)) return;            // ya tenía prefijo
+      el.insertBefore(document.createTextNode('-- '), el.firstChild);
+    });
+  } else {
+    // Sin bloques: prefijar tras <br> o saltos de línea
+    let html = box.innerHTML || '';
+    html = html.replace(/\r\n/g,'\n');
+    const re = /((?:<br\s*\/?>(?:\s|&nbsp;)*)+|\n+)\s*(?!(?:--\s))(?=\S)/gi;
+    html = html.replace(re, (m, g1) => `${g1}-- `);
+    box.innerHTML = html;
+  }
+
+  try{
+    state.doc = getDocHTML();
+    saveDocDebounced();
+  }catch(_){/* noop */}
+}
+
+/* coletilla filiación */
+function getTipoDocShown(f){
+  const base = f["Tipo de documento"] || "";
+  if (base === "Otro documento de Identidad" || base === "Otro") {
+    // Si hay un texto específico, lo usamos; si no, mostramos el genérico
+    return f["Otro documento"] || "Otro documento de Identidad";
+  }
+  return base;
+}
+function buildColetilla(f){
+  const segs=[];const nom=[f["Nombre"],f["Apellidos"]].filter(Boolean).join(" ");if(nom)segs.push(nom);
+  const tdoc = getTipoDocShown(f);
+  const tdl  = String(tdoc || "").toLowerCase();
+
+  if (tdl === "indocumentado" || tdl === "indocumentada" || tdl === "indocumentado/a") {
+    // Texto estándar en la coletilla
+    segs.push("indocumentado/a");
+  } else if (tdoc && f["Nº Documento"]) {
+    segs.push(`con ${tdoc} nº ${f["Nº Documento"]}`);
+  } else if (tdoc) {
+    segs.push(`con ${tdoc}`);
+  }
+  const sexo=String(f["Sexo"]||"").toLowerCase();
+  const esM=/^(mujer|femenino|f)$/i.test(sexo), esH=/^(hombre|masculino|m|h|varón|varon)$/i.test(sexo);
+  if(f["Lugar de nacimiento"]||f["Fecha de nacimiento"]){
+    let n=esM?"nacida":(esH?"nacido":"nacido/a");
+    if(f["Lugar de nacimiento"]) n+=` en ${f["Lugar de nacimiento"]}`;
+    if(f["Fecha de nacimiento"]) n+=` el ${f["Fecha de nacimiento"]}`;
+    segs.push(n);
+  }
+  if(f["Nombre de los Padres"]){const hijo=esM?"hija":(esH?"hijo":"hijo/a");segs.push(`${hijo} de ${f["Nombre de los Padres"]}`)}
+  if(f["Domicilio"]) segs.push(`domicilio en ${f["Domicilio"]}`);
+  if(f["Teléfono"]) segs.push(`teléfono ${f["Teléfono"]}`);
+  return segs.join(", ");
+}
+/* incluir en texto */
+function includeFiliacion(fid){const f=state.filiaciones.find(x=>x.fixedId===fid);if(!f){alert("Filiación no encontrada");return}
+  if(!f["Condición"]||f["Condición"]===""){alert("Selecciona la CONDICIÓN antes de enviar esta filiación al texto.");return}
+  insertHTMLAtCursor(escapeHtml(buildColetilla(f)));editorFocus();collapseAllDetails()}
+/* caret insert */
+function insertHTMLAtCursor(html){
+  const ed=editorEl();ed.focus();const sel=window.getSelection();let range=null;
+  if(savedRange){sel.removeAllRanges();sel.addRange(savedRange);range=savedRange.cloneRange()}
+  else if(sel&&sel.rangeCount>0&&ed.contains(sel.getRangeAt(0).startContainer)){range=sel.getRangeAt(0).cloneRange()}
+  else{range=document.createRange();range.selectNodeContents(ed);range.collapse(false);sel.removeAllRanges();sel.addRange(range)}
+  const temp=document.createElement('div');temp.innerHTML=html;const frag=document.createDocumentFragment();let last=null;while(temp.firstChild){last=frag.appendChild(temp.firstChild)}
+  range.deleteContents();range.insertNode(frag);
+  if(last){range.setStartAfter(last);range.collapse(true);sel.removeAllRanges();sel.addRange(range);savedRange=range.cloneRange()}
+  state.doc=getDocHTML();saveDocDebounced()
+}
+/* plegar detalles */
+function collapseAllDetails(){document.querySelectorAll('#filiaciones details[open]').forEach(d=>d.open=false);openedIndex=-1}
+
+/* título ficha */
+function computeTituloFicha(f){const t=(f["Nombre"]||"")+" "+((f["Apellidos"]||"").split(/\s+/)[0]||"");return t.trim()||"Filiación"}
+
+/* render filiaciones */
+function renderFiliaciones(){
+  function isInside(e,root){
+    try{if(e&&typeof e.composedPath==='function'){const path=e.composedPath();if(Array.isArray(path))return path.includes(root)}}catch{}
+    try{const cand=(e&&(e.relatedTarget||document.activeElement))||null;return !!(root&&cand&&typeof cand.nodeType==='number'&&root.contains(cand))}catch{return false}
+  }
+  const cont=$("#filiaciones");cont.innerHTML="";
+  state.filiaciones.forEach((f,i)=>{
+    const det=document.createElement('details');det.open=(openedIndex===i);
+    const titulo=computeTituloFicha(f);
+
+    // Detectar si es detenido (no tocar selects en ese caso)
+    const condRaw = String(f["Condición"]||"")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g,"")
+      .toLowerCase();
+    const isDetenido = condRaw.includes("detenid") || condRaw.includes("det. p. local");
+    const tagClass = isDetenido ? "tag tag-det" : "tag";
+    const ampliarBtnHTML = isDetenido
+      ? `<button class="btn tiny" data-detalle-det="${i}">🧾 Ficha completa</button>`
+      : "";
+
+    // ==== Condición: input libre para detenido, select para el resto ====
+    let condicionHTML;
+    if (isDetenido){
+      condicionHTML = `
+          <div class="col" style="flex:1 1 200px;">
+            <label>Condición</label>
+            <input data-k="Condición" data-i="${i}" value="${f["Condición"]||''}" />
+          </div>`;
+    } else {
+      const cVal = String(f["Condición"]||"");
+      condicionHTML = `
+          <div class="col" style="flex:1 1 200px;">
+            <label>Condición</label>
+            <select data-k="Condición" data-i="${i}">
+              <option value=""></option>
+              <option value="Perjudicado" ${cVal==="Perjudicado"?'selected':''}>Perjudicado</option>
+               <option value="Víctima" ${cVal==="Víctima"?'selected':''}>Víctima</option>
+              <option value="Testigo" ${cVal==="Testigo"?'selected':''}>Testigo</option>
+              <option value="Requirente" ${cVal==="Requirente"?'selected':''}>Requirente</option>
+              <option value="Identificado" ${cVal==="Identificado"?'selected':''}>Identificado</option>
+              <option value="Infractor" ${cVal==="Infractor"?'selected':''}>Infractor</option>
+              <option value="Denunciado" ${cVal==="Denunciado"?'selected':''}>Denunciado</option>
+              <option value="Investigado" ${cVal==="Investigado"?'selected':''}>Investigado</option>
+              <option value="Det. P. Local">Det. P. Local</option>
+              <option value="Finado" ${cVal==="Finado"?'selected':''}>Finado</option>
+            </select>
+          </div>`;
+    }
+
+    // ==== Sexo: siempre select M/F, también para detenido ====
+    const sexoVal = String(f["Sexo"] || "");
+    const esM = (/^(masculino|hombre|m|h|varón|varon)$/i).test(sexoVal);
+    const esF = (/^(femenino|mujer|f)$/i).test(sexoVal);
+    const sexoHTML = `
+        <div class="col" style="flex:1 1 120px;">
+          <label>Sexo</label>
+          <select data-k="Sexo" data-i="${i}">
+            <option value=""></option>
+            <option value="Masculino" ${esM ? 'selected' : ''}>Masculino</option>
+            <option value="Femenino" ${esF ? 'selected' : ''}>Femenino</option>
+          </select>
+        </div>`;
+
+    // ==== Tipo de documento: siempre select común + "Otro documento" ====
+    let tipoDocHTML;
+    let otroDocColHTML = "";
+
+    const tdRaw = String(f["Tipo de documento"] || "").trim();
+    const tdNorm = tdRaw
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase();
+
+    const esDNI      = tdNorm === "dni" || tdNorm.includes("documento nacional de identidad");
+    const esNIE      = tdNorm === "nie";
+    const esPas      = tdNorm === "pasaporte";
+    const esCarta    = tdNorm.includes("carta nacional") || tdNorm === "cni";
+    const esIndocMas = tdNorm === "indocumentado";
+    const esIndocFem = tdNorm === "indocumentada";
+    const esIndocAmb = tdNorm === "indocumentado/a" || tdNorm === "indocumentad@";
+
+    let showOther = false;
+    let otroVal = f["Otro documento"] || "";
+
+    if (!(esDNI || esNIE || esPas || esCarta || esIndocMas || esIndocFem) && tdRaw !== "") {
+      showOther = true;
+      if (!otroVal && tdRaw) otroVal = tdRaw;
+    }
+
+    tipoDocHTML = `
+        <div class="col" style="flex:1 1 200px;">
+          <label>Tipo de documento</label>
+          <select data-k="Tipo de documento" data-i="${i}">
+            <option value=""></option>
+            <option value="DNI" ${esDNI ? 'selected' : ''}>DNI</option>
+            <option value="NIE" ${esNIE ? 'selected' : ''}>NIE</option>
+            <option value="Pasaporte" ${esPas ? 'selected' : ''}>Pasaporte</option>
+            <option value="Carta Nacional de Identidad" ${esCarta ? 'selected' : ''}>Carta Nacional de Identidad</option>
+            <option value="Indocumentado" ${(esIndocMas || esIndocAmb) ? 'selected' : ''}>Indocumentado</option>
+            <option value="Indocumentada" ${esIndocFem ? 'selected' : ''}>Indocumentada</option>
+            <option value="Otro documento de Identidad" ${showOther ? 'selected' : ''}>Otro documento de Identidad</option>
+          </select>
+        </div>`;
+
+    otroDocColHTML = `
+        <div class="col otro-doc-col" style="flex:1 1 200px;${showOther ? "" : "display:none;"}">
+          <label>Otro documento</label>
+          <input data-k="Otro documento" data-i="${i}" value="${otroVal}" />
+        </div>`;
+
+    // ==== Fecha de nacimiento ISO para input type="date"
+    const fechaIso = toDateInputValue(f["Fecha de nacimiento"] || "");
+
+    // ==== Plantilla completa ====
+    det.innerHTML=`
+  <summary>
+    <span class="${tagClass}">#${String(f.fixedId).padStart(2,'0')}</span>
+    <span class="title">${escapeHtml(titulo)}</span>
+    <span class="summary-right">
+      <button class="btn success tiny" data-include="${f.fixedId}" title="Añadir esta filiación al texto principal">
+        📄
+        <svg class="ico-arrow" viewBox="0 0 16 16" width="14" height="14">
+          <path d="M10 2 L4 8 L10 14" stroke="currentColor" stroke-width="2" fill="none"/>
+        </svg>
+        👤
+      </button>
+    </span>
+  </summary>
+  <div class="details-body">
+    <div class="row" style="display:flex;flex-wrap:wrap;gap:8px;">
+      ${condicionHTML}
+      ${sexoHTML}
+      <div class="col" style="flex:1 1 200px;"><label>Nombre</label><input data-k="Nombre" data-i="${i}" value="${f["Nombre"]||''}" /></div>
+      <div class="col" style="flex:1 1 200px;"><label>Apellidos</label><input data-k="Apellidos" data-i="${f["Apellidos"]||''?i:i}" value="${f["Apellidos"]||''}" /></div>
+      ${tipoDocHTML}
+      ${otroDocColHTML}
+      <div class="col" style="flex:1 1 200px;"><label>Nº Documento</label><input data-k="Nº Documento" data-i="${i}" value="${f["Nº Documento"]||''}" /></div>
+      <div class="col" style="flex:1 1 200px;"><label>Nacionalidad</label><input list="listaPaises" data-k="Nacionalidad" data-i="${i}" value="${f["Nacionalidad"]||''}" /></div>
+      <div class="col" style="flex:1 1 200px;"><label>Fecha Nac.</label><input type="date" data-k="Fecha de nacimiento" data-i="${i}" value="${fechaIso}" /></div>
+      <div class="col" style="flex:1 1 200px;"><label>Lugar Nac.</label><input data-k="Lugar de nacimiento" data-i="${i}" value="${f["Lugar de nacimiento"]||''}" /></div>
+      <div class="col" style="flex:1 1 200px;"><label>Padres</label><input data-k="Nombre de los Padres" data-i="${i}" value="${f["Nombre de los Padres"]||''}" /></div>
+      <div class="col" style="flex:1 1 200px;"><label>Domicilio</label><input data-k="Domicilio" data-i="${i}" value="${f["Domicilio"]||''}" /></div>
+      <div class="col" style="flex:1 1 200px;"><label>Teléfono</label><input data-k="Teléfono" data-i="${i}" value="${f["Teléfono"]||''}" /></div>
+    </div>
+    <div class="btn-row" style="margin-top:14px;justify-content:flex-start;">
+      <button class="btn danger tiny" data-del="${i}" data-det="${isDetenido ? '1' : '0'}" style="margin-left:auto;">🗑️</button>
+    </div>
+  </div>`;
+        det.addEventListener('toggle',()=>{
+      if(det.open){
+        openedIndex = i;
+        cont.querySelectorAll('details').forEach((d,j)=>{
+          if(j!==i) d.open = false;
+        });
+        // Si es detenido, al desplegar la ficha lateral abrimos también la ficha completa
+        if (isDetenido &&
+            window.CompaDetenidoDetalle &&
+            typeof window.CompaDetenidoDetalle.open === 'function') {
+          window.CompaDetenidoDetalle.open(f, i);
+        }
+      } else {
+        if (openedIndex === i) openedIndex = -1;
+        // Al replegar la ficha lateral, cerramos también la ficha completa si está abierta
+        if (isDetenido &&
+            window.CompaDetenidoDetalle &&
+            typeof window.CompaDetenidoDetalle.close === 'function') {
+          window.CompaDetenidoDetalle.close();
+        }
+      }
+    });
+    det.addEventListener('focusout',(e)=>{if(!isInside(e,det)){det.open=false;if(openedIndex===i)openedIndex=-1}});
+    cont.appendChild(det);
+
+    // Si esta ficha ya viene abierta (por ejemplo, tras importar un DETENIDO),
+    // y es un detenido, sincronizar también la vista ampliada de la izquierda.
+    if (openedIndex === i &&
+        isDetenido &&
+        window.CompaDetenidoDetalle &&
+        typeof window.CompaDetenidoDetalle.open === 'function') {
+      window.CompaDetenidoDetalle.open(f, i);
+    }
+  });
+
+  /* lista objetos */
+  const objWrap=document.createElement('div');objWrap.id="objetosSection";
+  objWrap.innerHTML=`
+    <div class="row" style="margin-top:12px;display:flex;gap:8px;align-items:flex-start;">
+      <div id="addObjPanel" style="display:none;flex:1 1 auto;">
+        <label style="display:block;font-size:12px;color:var(--muted);margin:4px 0 6px;">Nuevo objeto</label>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <input id="newObjInput" maxlength="100" style="flex:1 1 auto;"/>
+          <button class="btn success tiny" id="saveObjBtn">Guardar</button>
+          <button class="btn secondary tiny" id="cancelObjBtn">Cancelar</button>
+        </div>
+      </div>
+    </div>
+    <div id="objetosList" style="margin-top:8px;"></div>`;
+  cont.appendChild(objWrap);
+
+  const list=objWrap.querySelector("#objetosList");
+  list.innerHTML="";
+  state.objects=state.objects||[];
+  state.objects.forEach((txt,idx)=>{
+    const d=document.createElement('details');
+    d.innerHTML=`
+      <summary><span class="title">Objeto #${idx+1}</span><span class="caret"></span></summary>
+      <div class="details-body">
+        <div class="muted" style="margin-bottom:8px">${escapeHtml(txt)}</div>
+        <div class="btn-row" style="justify-content:flex-end;">
+          <button class="btn danger tiny" data-obj-del="${idx}" title="Eliminar">🗑️</button>
+        </div>
+      </div>`;
+    list.appendChild(d);
+  });
+  list.querySelectorAll('button[data-obj-del]').forEach(b=>b.onclick=()=>{
+    const i=+b.dataset.objDel;state.objects.splice(i,1);save();renderFiliaciones();
+  });
+
+  /* listeners campos */
+  $('#emptyHint').style.display=state.filiaciones.length?'none':'block';
+  cont.querySelectorAll('input[data-k],select[data-k]').forEach(inp=>{
+
+    // Si se selecciona "Det. P. Local" en la condición, convertir automáticamente a "Detenido"
+    if (inp.tagName === "SELECT" && inp.dataset.k === "Condición") {
+      inp.addEventListener("change", () => {
+        const idx = +inp.dataset.i;
+        const f = state.filiaciones[idx];
+        if (!f) return;
+        const val = (inp.value || "").trim();
+        if (val === "Det. P. Local") {
+          // Normalizamos a "Detenido" para que toda la lógica lo trate como tal
+          f["Condición"] = "Detenido";
+          inp.value = "Detenido";
+          try{
+            if (typeof save === "function") save();
+            if (typeof renderFiliaciones === "function") renderFiliaciones();
+          }catch(_){}
+        }
+      });
+    }
+
+    // Promoción automática a modo detenido si se selecciona "Det. P. Local"
+    if (inp.tagName === "SELECT" && inp.dataset.k === "Condición") {
+      inp.addEventListener("change", () => {
+        const idx = +inp.dataset.i;
+        const f = state.filiaciones[idx];
+        const v = (inp.value || "").toLowerCase();
+        if (!f) return;
+        if (v === "det. p. local") {
+          // Actualizamos la condición en el estado (se detectará como detenido en el siguiente render)
+          f["Condición"] = "Detenido P. Local";
+          try {
+            if (typeof save === "function") save();
+          } catch(_) {}
+          // Forzamos que esta ficha quede marcada como abierta
+          openedIndex = idx;
+          // Re-pintamos las filiaciones; la lógica de render ya:
+          //  - le aplicará el tag rojo
+          //  - y abrirá el modal de detalle al estar openedIndex apuntando aquí
+          renderFiliaciones();
+        }
+      });
+    }
+
+    inp.addEventListener('input',e=>{
+      const i=+e.target.dataset.i,k=e.target.dataset.k,f=state.filiaciones[i];const before=e.target.value;
+
+      // Teléfono: solo números
+      if (k === "Teléfono") {
+        const clean = before.replace(/[^0-9]/g, "");
+        e.target.value = clean;
+        f[k] = clean;
+        saveDebounced();
+        return;
+      }
+
+      // Fecha de nacimiento: input type="date" → guardamos dd/mm/aaaa para compatibilidad
+      if (k === "Fecha de nacimiento") {
+        const stored = fromDateInputValue(before);
+        f[k] = stored;
+        // No tocamos e.target.value: el navegador gestiona el formato ISO en el control
+        saveDebounced();
+        return;
+      }
+
+      let val = before;
+      if (k === "Nombre" || k === "Lugar de nacimiento" || k === "Domicilio" || k === "Nombre de los Padres" || k === "Otro documento" || k === "Nacionalidad") {
+        val = titleCasePreservingEdges(before);
+      } else if (k === "Apellidos" || k === "Nº Documento") {
+        val = toUpper(before);
+      }
+
+      if (k !== "Tipo de documento" && k !== "Apellidos" && k !== "Nº Documento") {
+        val = titleCasePreservingEdges(before);
+        e.target.value = val;
+      }
+
+      f[k] = val;
+      e.target.value = val;
+
+      if (k === "Tipo de documento") {
+        const det = e.target.closest('details');
+        const otherCol = det && det.querySelector('.otro-doc-col');
+        if (otherCol) {
+          otherCol.style.display = (e.target.value === "Otro documento de Identidad") ? "" : "none";
+        }
+        if (e.target.value !== "Otro documento de Identidad") {
+          f["Otro documento"] = "";
+          const od = det && det.querySelector('input[data-k="Otro documento"]');
+          if (od) od.value = "";
+        }
+      }
+
+      saveDebounced();
+    });
+    inp.addEventListener('blur',e=>{
+      const det=e.target.closest('details');
+      setTimeout(()=>{
+        const fakeEvt={composedPath:null,relatedTarget:document.activeElement};
+        // Si no hay details asociado, nada que hacer
+        if(!det) return;
+        // Si la vista ampliada de detenido está abierta, NO auto-cerrar el details
+        try{
+          if (window.CompaDetenidoDetalle &&
+              typeof window.CompaDetenidoDetalle.isOpen === 'function' &&
+              window.CompaDetenidoDetalle.isOpen()){
+            return;
+          }
+        }catch(_){/* noop */}
+        // Comportamiento original: cerrar si el foco ha salido fuera del details
+        const inside = (function(root){
+          try{
+            const cand=(fakeEvt&&(fakeEvt.relatedTarget||document.activeElement))||null;
+            return !!(root&&cand&&typeof cand.nodeType==='number'&&root.contains(cand));
+          }catch{return false}
+        })(det);
+        if(!inside){
+          det.open=false;
+          const idx=+e.target.dataset.i;
+          if(openedIndex===idx)openedIndex=-1;
+        }
+      },0);
+    });
+  });
+
+  cont.querySelectorAll('button[data-del]').forEach(b=>b.onclick=()=>{
+    const i = +b.dataset.del;
+    const isDet = b.dataset.det === '1';
+
+    // Si es detenido y hay modal de detalle abierto, cerrarlo
+    try{
+      if (isDet &&
+          window.CompaDetenidoDetalle &&
+          typeof window.CompaDetenidoDetalle.close === 'function') {
+        window.CompaDetenidoDetalle.close();
+      }
+    }catch(_){/* noop */}
+
+    state.filiaciones.splice(i,1);
+    save();
+    openedIndex = -1;
+    renderFiliaciones();
+  });
+  cont.querySelectorAll('button[data-include]').forEach(b=>b.onclick=()=> includeFiliacion(+b.dataset.include));
+  // (Eliminado: Listener para botón ODT+JSON de detenido, ya no existe)
+  // Botón de cabecera "Trámites🧾" en la ficha lateral (no afecta al desplegable)
+  cont.querySelectorAll('button[data-det-odt-summary]').forEach(b => {
+    b.onclick = (ev) => {
+      // Evitamos que el clic en el botón abra/cierre el <details>:
+      ev.preventDefault();
+      ev.stopPropagation();
+      const idx = +b.dataset.detOdtSummary;
+      const f = state.filiaciones[idx];
+      if (!f) return;
+      if (typeof window.CompaExportDetenidoODTJSON === 'function') {
+        try{
+          window.CompaExportDetenidoODTJSON(f, idx);
+        }catch(e){
+          console.error('Error al exportar ODT/JSON desde cabecera de ficha', e);
+        }
+      } else {
+        console.warn('CompaExportDetenidoODTJSON no está definido.');
+      }
+    };
+  });
+
+  const addBtn=document.querySelector("#addObjBtn");
+  const panel=objWrap.querySelector("#addObjPanel");
+  const input=objWrap.querySelector("#newObjInput");
+  const saveB=objWrap.querySelector("#saveObjBtn");
+  const cancelB=objWrap.querySelector("#cancelObjBtn");
+  addBtn.onclick=()=>{panel.style.display="block";input.value="";input.focus()};
+  cancelB.onclick=()=>{panel.style.display="none";input.value=""};
+  saveB.onclick=()=>{
+    const txt=(input.value||"").trim();
+    if(!txt){
+      alert("Escribe una descripción (hasta 100 caracteres).");
+      input.focus();
+      return;
+    }
+    state.objects.push(txt.slice(0,100));
+    save();
+    const d=document.createElement('details');
+    const idx=state.objects.length;
+    d.innerHTML=`<summary><span class="title">Objeto #${idx}</span><span class="caret"></span></summary>
+      <div class="details-body"><div class="muted" style="margin-bottom:8px">${escapeHtml(txt)}</div>
+      <div class="btn-row" style="justify-content:flex-end;"><button class="btn danger tiny" data-obj-del="${idx-1}" title="Eliminar">🗑️</button></div></div>`;
+    list.appendChild(d);
+    // enganchar botón eliminar para este nuevo objeto
+    const delBtn=d.querySelector('button[data-obj-del]');
+    if(delBtn){
+      delBtn.onclick=()=>{
+        const i=+delBtn.dataset.objDel;
+        state.objects.splice(i,1);
+        save();
+        renderFiliaciones();
+      };
+    }
+    panel.style.display="none";
+    input.value="";
+  };
+}
+
+/* coletillas modal */
+const COLETILLAS=[
+  {label:"REDACCIÓN ACTUANTES",text:"- Los comparecientes redactan la intervención relacionada con los hechos que nos ocupan, realizando esta Instrucción la transcripción de lo narrado por los actuantes como se detalla a continuación:"},
+  {label:"FILIACIONES",text:"- A continuación, se procede a detallar el conjunto de filiaciones en relación a los hechos participados:"}
+];
+function renderColetillas(){const cont=$("#coletillasList");cont.innerHTML="";COLETILLAS.forEach(c=>{const el=document.createElement('div');el.className="coletilla";el.innerHTML=`<div class="label">${c.label}</div><button class="btn secondary tiny">➜ Insertar</button>`;el.querySelector('button').onclick=()=>{insertHTMLAtCursor(escapeHtml(c.text)+"<br>");closeColetillas()};cont.appendChild(el)})}
+function openColetillas(){ $('#coletillasModal').classList.add('show');renderColetillas() }
+function closeColetillas(){ $('#coletillasModal').classList.remove('show') }
+
+const openColetBtn = document.getElementById("openColetillasBtn");
+if (openColetBtn) openColetBtn.onclick = openColetillas;
+
+const closeColetBtn = document.getElementById("closeColetillasBtn");
+if (closeColetBtn) closeColetBtn.onclick = closeColetillas;
+
+/* atajos y caret doc */
+(function(){
+  const ed=$('#doc');if(!ed) return;
+  function insertTextAtCaret(txt){const sel=window.getSelection?.();if(!sel||sel.rangeCount===0)return;const r=sel.getRangeAt(0);r.deleteContents();const tn=document.createTextNode(txt);r.insertNode(tn);r.setStartAfter(tn);r.collapse(true);sel.removeAllRanges();sel.addRange(r)}
+  function focusDocSoon(){const ed=$('#doc');if(!ed)return;try{const sel=window.getSelection();const r=document.createRange();r.selectNodeContents(ed);r.collapse(false);sel.removeAllRanges();sel.addRange(r)}catch{}ed.focus({preventScroll:true})}
+  function onKeyDownDocument(ev){if(ev.ctrlKey&&!ev.shiftKey&&!ev.altKey&&ev.key==="1"){ev.preventDefault();const btn=$("#exportOdtBtn");if(btn&&!btn.disabled)btn.click()}}
+  let capNext=false;
+  function onEditorKeyDown(ev){
+    const ed=$("#doc");if(!ed)return;const key=ev.key;
+    if(key==="Enter"){ev.preventDefault();const sel=window.getSelection?.();if(sel&&sel.rangeCount){const r=sel.getRangeAt(0);r.deleteContents();const br=document.createElement('br');r.insertNode(br);r.setStartAfter(br);r.collapse(true);sel.removeAllRanges();sel.addRange(r)}capNext=true;return}
+    if(key.length===1&&/[\p{L}]/u.test(key)){
+      if(capNext){ev.preventDefault();insertTextAtCaret(key.toUpperCase());capNext=false;return}
+      try{const sel=window.getSelection?.();if(ed&&sel&&sel.rangeCount){const rr=sel.getRangeAt(0).cloneRange();rr.collapse(true);const fromStart=rr.cloneRange();fromStart.setStart(ed,0);const prev=fromStart.toString();if(prev.endsWith(". ")){ev.preventDefault();insertTextAtCaret(key.toUpperCase());return}}}catch{}
+    }
+  }
+  function bindTituloUpperAndFocus(){const t=$("#titulo");if(!t)return;t.addEventListener("input",(e)=>{const el=e.target;const val=el.value||"";const pos=el.selectionStart??val.length;const upper=val.toUpperCase();if(upper!==val){el.value=upper;try{el.setSelectionRange(pos,pos)}catch{}}},false)}
+  function start(){const ed=$("#doc");if(ed){ed.addEventListener("keydown",onEditorKeyDown,false)}bindTituloUpperAndFocus();focusDocSoon();window.addEventListener("pageshow",()=>{focusDocSoon()},false);const r=$("#refreshTopBtn");if(r){r.addEventListener("click",()=>{setTimeout(()=>{focusDocSoon()},0)},false)}document.addEventListener("keydown",onKeyDownDocument,false)}
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",start);else start();
+})();
+
+/* iniciar interfaz */
+(function init(){
+  try{if(typeof window.load==='function') window.load()}catch{}
+  const ed=document.querySelector('#doc');if(ed) ed.innerHTML=(window.state?.doc||ed.innerHTML||'');
+  const tituloEl=document.querySelector('#titulo');if(tituloEl) tituloEl.value=(window.state?.titulo||tituloEl.value||'');
+  openedIndex=-1;if(typeof window.renderFiliaciones==='function') window.renderFiliaciones();
+})();
+
+/* export prometeo */
+</script>
+<script src="js/pdf.min.js"></script>
+<script>
+  const pdfjsLib = window['pdfjs-dist/build/pdf'];
+</script>
+<script src="js/pdf_import.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  try{
+    if (window.PdfImport && typeof window.PdfImport.initForCompaODAC === 'function') {
+      window.PdfImport.initForCompaODAC({
+        targetSelector: '#pdfImportSlot',
+        label: '📄 Importar PDF'
+      });
+    }
+  }catch(_){}
+});
+</script>
+<script src="js/prometeo_export.js"></script>
+<script src="js/odt_zip.js"></script>
+<script src="js/compa_detalle_detenido.js"></script>
+<script src="js/entrada_logo"></script>
+<script>
+/* bridge coordenadas */
+(function(){
+  const btn=document.getElementById('openCoordsBtn'); if(!btn) return;
+  const LS_KEY_COORDS='compa_coords';
+  function mark(has){if(!btn)return;if(has){btn.textContent='📍 Coordenadas ✓';btn.classList.add('active')}else{btn.textContent='📍 Coordenadas';btn.classList.remove('active')}}
+  (function(){try{const ls=JSON.parse(localStorage.getItem(LS_KEY_COORDS)||'null');if(ls&&typeof ls.lat==='number'&&typeof ls.lng==='number'){mark(true);return}}catch{}try{if(window.state&&window.state.coordenadas&&typeof window.state.coordenadas.lat==='number'){mark(true);return}}catch{}mark(false)})();
+  function mergeCoords(obj){try{const ls=JSON.parse(localStorage.getItem(LS_KEY_COORDS)||'null');if(ls&&typeof ls.lat==='number'&&typeof ls.lng==='number'){obj.coordenadas={lat:ls.lat,lng:ls.lng};return obj}}catch{}if(window.state&&window.state.coordenadas){obj.coordenadas=window.state.coordenadas}return obj}
+  function openPicker(){
+    try{
+      const pickerUrl=new URL('../Registro coordenadas/picker/map_picker.html',window.location.href).href;
+      const pickerWin=window.open(pickerUrl,'mapPicker','width=980,height=740');
+      if(!pickerWin) alert('No se pudo abrir la ventana del mapa. ¿Popup bloqueado?');
+      const onMsg=(ev)=>{try{const d=ev&&ev.data?ev.data:{};if(d&&d.type==='coords-picked'&&Array.isArray(d.coords)){const lat=Number(d.coords[0]);const lng=Number(d.coords[1]);try{localStorage.setItem(LS_KEY_COORDS,JSON.stringify({lat,lng}))}catch{}try{window.state=window.state||{};window.state.coordenadas={lat,lng};if(typeof window.save==='function') window.save()}catch{}mark(true);alert('Coordenadas guardadas.')}}catch{}window.removeEventListener('message',onMsg);try{if(pickerWin) pickerWin.close()}catch{}};
+      window.addEventListener('message',onMsg);
+    }catch{alert('No se pudo abrir el selector de mapa.')}
+  }
+  btn.addEventListener('click',openPicker,{passive:true});
+  if(typeof window.download==='function'&&!window.download.__coordsHooked){
+    const prev=window.download;
+    window.download=async function(filename,data,type){
+      try{
+        if(typeof data==='string'&&data.trim().startsWith('{')){try{const obj=JSON.parse(data);mergeCoords(obj);data=JSON.stringify(obj,null,2)}catch{}}
+        else if(data&&typeof data==='object'){try{mergeCoords(data)}catch{}}
+      }catch{}
+      return prev.call(this,filename,data,type);
+    };
+    window.download.__coordsHooked=true;
+  }
+})();
+</script>
+<script src="js/macro_dilipol.js"></script>
+
+<script>
+/* drogas delegado click */
+(function(){
+  function isAddObjectButton(el){
+    if(!el) return false;
+    if(el.id&&/^(addObjectBtn|btnAddObject|addObjBtn)$/i.test(el.id)) return true;
+    if(el.matches&&el.matches('[data-add-object],[data-role="add-obj"]')) return true;
+    const txt=(el.textContent||"").trim().toLowerCase(); if(txt.startsWith("añadir objeto")) return true;
+    return false;
+  }
+  function closestAddButton(node){let el=node;while(el&&el!==document&&el!==window){if(el.nodeType===1&&isAddObjectButton(el)) return el;el=el.parentNode}return null}
+  function addToAppState(strings){
+    try{
+      if(!window.state||!Array.isArray(window.state.objects)) return false;
+      strings.forEach(s=>{if(typeof s==="string"){const t=s.trim();if(t) window.state.objects.push(t)}});
+      if(typeof window.save==="function") window.save();
+      if(typeof window.renderFiliaciones==="function") window.renderFiliaciones();
+      document.dispatchEvent(new CustomEvent("objetos:changed",{detail:{count:window.state.objects.length,key:"objects"}}));
+      document.dispatchEvent(new CustomEvent("objetos:sync"));
+      return true;
+    }catch(e){console.error("[drogas_delegate] addToAppState error:",e);return false}
+  }
+  const LS_KEYS=["expedienteAbierto","expedienteGuardado","expedienteOriginal","proyecto"];
+  function readFirstExpediente(){for(const k of LS_KEYS){const raw=localStorage.getItem(k);if(!raw) continue;try{ return {key:k,obj:JSON.parse(raw),existingKeys:LS_KEYS.filter(x=>localStorage.getItem(x)!==null)} }catch{}}return null}
+  function writeToExistingKeys(st){const payload=JSON.stringify(st.obj);st.existingKeys.forEach(k=>localStorage.setItem(k,payload))}
+  function ensureObjsKey(o){if(Array.isArray(o.objects)) return "objects";if(Array.isArray(o.objetos)) return "objetos";o.objects=[];return "objects"}
+  function addFallback(strings){
+    const st=readFirstExpediente();if(!st) return false;const key=ensureObjsKey(st.obj);
+    const arr=Array.isArray(st.obj[key])?st.obj[key]:(st.obj[key]=[]);strings.forEach(s=>{if(typeof s==="string"&&s.trim()) arr.push(s.trim())});
+    writeToExistingKeys(st);
+    document.dispatchEvent(new CustomEvent("objetos:changed",{detail:{count:arr.length,key}}));
+    document.dispatchEvent(new CustomEvent("objetos:sync"));
+    return true;
+  }
+  function onDocClick(ev){
+    const btn=closestAddButton(ev.target); if(!btn) return;
+    if(!window.DrogasFlow||typeof window.DrogasFlow.askThen!=="function") return;
+    if(btn.dataset.skipDrugHook==="1"){delete btn.dataset.skipDrugHook;return}
+    ev.preventDefault();ev.stopImmediatePropagation();
+    window.DrogasFlow.askThen(
+      function runOriginal(){btn.dataset.skipDrugHook="1";try{btn.click()}finally{setTimeout(()=>{delete btn.dataset.skipDrugHook},0)}},
+      function onCommit(items){const strings=(items||[]).filter(s=>typeof s==="string"&&s.trim());if(!strings.length) return;const ok=addToAppState(strings);if(!ok) addFallback(strings);}
+    );
+  }
+  if(!window.__drogasDelegateBound){window.__drogasDelegateBound=true;document.addEventListener("click",onDocClick,true)}
+})();
+</script>
+
+<script>
+/* drogas modal */
+(function(){
+  const DRUGS=["Cannabis (marihuana)","Hachís","Cocaína","Heroína","MDMA (cristal)","Éxtasis (MDMA)","Anfetamina","Metanfetamina","LSD","Ketamina","GHB/GBL","PCP","Mefedrona","2C-B","Fentanilo","Oxicodona","Morfina","Codeína","Metadona","Tramadol","Benzodiacepinas (diazepam)","Clonazepam","Alprazolam","Barbitúricos","Setas psilocibinas","Poppers (nitrito de amilo)","Spice (can. sint.)","Kratom","Peyote/Mescalina","DMT"];
+  function el(tag,attrs={},...children){const n=document.createElement(tag);Object.entries(attrs).forEach(([k,v])=>{if(k==="style"&&typeof v==="object")Object.assign(n.style,v);else if(k.startsWith("on")&&typeof v==="function") n[k.toLowerCase()]=v;else if(v!=null) n.setAttribute(k,v)});children.forEach(c=>n.appendChild(typeof c==="string"?document.createTextNode(c):c));return n}
+  function explain(){return el("div",{style:{opacity:.8,fontSize:"13px",marginBottom:"8px"}},"Completa cantidad, unidad y sustancia. Puedes añadir varias líneas o eliminarlas antes de confirmar.")}
+  function makeDrugRow(){
+    const row=el("div",{class:"drug-row",style:{display:"grid",gridTemplateColumns:"120px 160px 1fr 80px",gap:"10px",alignItems:"center"}});
+    const qty=el("input",{type:"number",step:"0.01",min:"0",placeholder:"Cantidad",style:iStyle()});
+    const unitWrap=el("div",{style:{display:"flex",gap:"8px",alignItems:"center"}});
+    const unit=el("select",{style:sStyle()},el("option",{value:"gramo"},"gramo"),el("option",{value:"dosis"},"dosis"),el("option",{value:"otro"},"otro"));
+    const unitOther=el("input",{type:"text",placeholder:"unidad…",style:Object.assign(iStyle(),{width:"110px",display:"none"})});
+    unit.addEventListener("change",()=>{unitOther.style.display=unit.value==="otro"?"block":"none"});
+    unitWrap.appendChild(unit);unitWrap.appendChild(unitOther);
+    const drug=el("select",{style:sStyle()},...DRUGS.map(d=>el("option",{value:d},d)),el("option",{value:"__otro__"},"Otro (especificar)"));
+    const drugOther=el("input",{type:"text",placeholder:"especificar…",style:Object.assign(iStyle(),{display:"none"})});
+    drug.addEventListener("change",()=>{drugOther.style.display=(drug.value==="__otro__")?"block":"none"});
+    const rm=el("button",{type:"button",style:rmStyle(),onclick:()=>row.remove()},"✕");
+    const drugWrap=el("div",{style:{display:"flex",gap:"8px",alignItems:"center"}});drugWrap.appendChild(drug);drugWrap.appendChild(drugOther);
+    row.appendChild(qty);row.appendChild(unitWrap);row.appendChild(drugWrap);row.appendChild(rm);return row;
+  }
+  function iStyle(){return{background:"#0b1220",color:"#e5e7eb",border:"1px solid #374151",borderRadius:"8px",padding:"8px 10px"}}
+  function sStyle(){return{background:"#0b1220",color:"#e5e7eb",border:"1px solid #374151",borderRadius:"8px",padding:"8px 10px",width:"100%"}}
+  function rmStyle(){return{background:"#b91c1c",border:"1px solid rgba(153,27,27,.6)",padding:"8px 10px",borderRadius:"8px",color:"#fff",cursor:"pointer"}}
+  function pluralize(u,q){if(u==="gramo") return Number(q)===1?"gramo":"gramos";return u}
+  function numPal(n){const u=["","uno","dos","tres","cuatro","cinco","seis","siete","ocho","nueve"];const e=["diez","once","doce","trece","catorce","quince","dieciséis","diecisiete","dieciocho","diecinueve"];const d=["","","veinte","treinta","cuarenta","cincuenta","sesenta","setenta","ochenta","noventa"];const c=["","ciento","doscientos","trescientos","cuatrocientos","quinientos","seiscientos","setecientos","ochocientos","novecientos"];if(n===0) return "cero";if(n===100)return"cien";if(n<10)return u[n];if(n<20)return e[n-10];if(n<100){const t=Math.floor(n/10),o=n%10;if(n===20)return"veinte";if(n<30)return"veinti"+u[o];return d[t]+(o?" y "+u[o]:"")}if(n<1000){const h=Math.floor(n/100),r=n%100;return c[h]+(r?" "+numPal(r):"")}if(n===1000)return"mil";return null}
+  function collectRows(listNode){
+    const out=[];listNode.querySelectorAll(".drug-row").forEach(row=>{
+      const inputs=row.querySelectorAll("input, select");const qty=inputs[0].value.trim();const unit=inputs[1].value;const unitOther=inputs[2].value.trim();const drug=inputs[3].value;const drugOther=inputs[4].value.trim();
+      const qtyNum=qty===""?null:Number(qty);if(qtyNum==null||isNaN(qtyNum)||qtyNum<=0) return;
+      let finalUnit=(unit==="otro"&&unitOther)?unitOther:pluralize(unit,qtyNum);let finalDrug=(drug==="__otro__"&&drugOther)?drugOther:drug;
+      let unitLower=String(finalUnit||"").toLowerCase().trim();if(unitLower==="kilo")unitLower="kilogramo";if(unitLower==="kilos")unitLower="kilogramos";
+      let qtyOut=Number(qtyNum);if((unitLower==="gramo"||unitLower==="gramos")&&qtyOut>=1000){qtyOut=qtyOut/1000;unitLower=(Number.isInteger(qtyOut)&&qtyOut===1)?"kilogramo":"kilogramos"}
+      const palabras=(Number.isInteger(qtyOut)&&qtyOut>=0&&qtyOut<=1000)?numPal(qtyOut):null;
+      const numTxt=palabras?(palabras.charAt(0).toUpperCase()+palabras.slice(1))+" ("+qtyOut.toLocaleString("es-ES")+")":qtyOut.toLocaleString("es-ES");
+      const drogaTxt=(finalDrug&&String(finalDrug).trim())?" de "+finalDrug:"";
+      out.push(`- ${numTxt} ${unitLower}${drogaTxt}`);
+    });return out;
+  }
+  function makeModalSkeleton(){
+    const overlay=el("div",{id:"drogasOverlay",style:{position:"fixed",inset:"0",background:"rgba(0,0,0,.55)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:9999}});
+    const card=el("div",{style:{width:"min(860px,94vw)",maxHeight:"90vh",overflow:"auto",background:"#111827",border:"1px solid #28324a",borderRadius:"12px",boxShadow:"0 10px 28px rgba(0,0,0,.45)",padding:"18px 20px",color:"#e5e7eb"}});
+    const title=el("div",{style:{fontSize:"20px",fontWeight:"800",marginBottom:"8px",color:"#7FFFD4"}},"Drogas — añadir ítems");
+    const list=el("div",{id:"drugItems",style:{display:"grid",gap:"10px",marginTop:"10px"}});
+    list.appendChild(makeDrugRow());
+    const addLineBtn=el("button",{type:"button",style:{padding:"8px 12px",borderRadius:"8px",border:"1px solid rgba(148,163,184,.25)",fontWeight:"800",cursor:"pointer",color:"#fff",background:"linear-gradient(135deg,#1e3a8a,#1d4ed8)"}}, "+ Añadir línea");
+    const footer=el("div",{style:{display:"flex",gap:"10px",marginTop:"16px",justifyContent:"flex-end"}});
+    const addBtn=el("button",{type:"button",style:{padding:"10px 14px",borderRadius:"10px",border:"1px solid rgba(148,163,184,.25)",fontWeight:"800",cursor:"pointer",color:"#fff",background:"linear-gradient(135deg,#1e3a8a,#1d4ed8)"}},"Añadir");
+    const closeBtn=el("button",{type:"button",style:{padding:"10px 14px",borderRadius:"10px",border:"1px solid rgba(148,163,184,.25)",fontWeight:"800",cursor:"pointer",color:"#fff",background:"linear-gradient(135deg,#374151,#4b5563)"},onclick:()=>{try{document.body.classList.remove('drogas-open')}catch{} overlay.remove()}}, "Salir");
+    addLineBtn.onclick=()=>list.appendChild(makeDrugRow());
+    addBtn.addEventListener("click",()=>{
+      const items = collectRows(list);
+      if(!items.length){
+        alert("Añade al menos una línea válida (cantidad > 0).");
+        return;
+      }
+      try{
+        if (typeof window.__DROGAS_ONCOMMIT === 'function') {
+          window.__DROGAS_ONCOMMIT(items);
+        }
+      }finally{
+        try{document.body.classList.remove('drogas-open')}catch{}
+        overlay.remove();
+      }
+    });
+    footer.appendChild(closeBtn);footer.appendChild(addBtn);card.appendChild(title);card.appendChild(explain());card.appendChild(list);card.appendChild(addLineBtn);card.appendChild(footer);overlay.appendChild(card);return{overlay,list,addBtn};
+  }
+  function askActivateDrogas(){return window.confirm("¿Activa drogas?")}
+  function openModal(onCommit){
+    window.__DROGAS_ONCOMMIT = (typeof onCommit === 'function') ? onCommit : null;
+    const {overlay} = makeModalSkeleton();
+    document.body.appendChild(overlay);
+    document.body.classList.add('drogas-open');
+  }
+  window.DrogasFlow={askThen(defaultAdder,onCommit){const yes=askActivateDrogas();if(!yes){if(typeof defaultAdder==="function") defaultAdder();return}openModal(onCommit)}};
+})();
+</script>
+
+<script>
+/* botones principales */
+(function(){
+  const saveBtn=document.getElementById('saveProjectBtn');
+  const loadBtn=document.getElementById('loadProjectBtn');
+  const loadInp=document.getElementById('loadProjectInput');
+  const dashBtn=document.getElementById('dashBtn');
+
+  // Copiar contenido del editor al portapapeles
+  const copyBtn = document.getElementById('copyBtn');
+  if(copyBtn){
+    copyBtn.addEventListener('click', ()=>{
+      try{
+        const txt = (document.getElementById('doc')?.innerText || '');
+        navigator.clipboard.writeText(txt);
+      }catch(_){}
+    });
+  }
+
+  /* guardar proyecto */
+  async function handleSave(){
+    try{
+      const ed=document.getElementById('doc');
+      const dilsHtml=(localStorage.getItem('odac_diligencias_html')||'');
+      state.doc=(ed&&typeof ed.innerHTML==='string')?ed.innerHTML:'';
+      const json={
+        doc:state.doc,html:state.doc,diligenciasHtml:dilsHtml,
+        filiaciones:Array.isArray(state.filiaciones)?state.filiaciones:[],
+        objects:Array.isArray(state.objects)?state.objects:[],
+        objetos:Array.isArray(state.objects)?state.objects.slice():[]
+      };
+            // Meta de documentos: Juzgado / procedimiento / abogado
+      ["Juzgado","Fecha de procedimiento","Hora de procedimiento","Abogado nombre","Abogado colegiado"]
+        .forEach(k=>{
+          if (state && typeof state[k]==="string" && state[k].trim()){
+            json[k]=state[k];
+          }
+        });
+      const fs=Array.isArray(state?.filiaciones)?state.filiaciones:[];
+      const raw=(fs.map(f=>f?.Diligencias||f?.diligencias).find(Boolean)||localStorage.getItem('diligencias')||localStorage.getItem('Diligencias')||'').trim();
+      const base=((raw.match(/\d+(?:\s*\/\s*\d+)?/)||[])[0]||raw).replace(/\s+/g,'').replace(/\//g,'-')||'SIN-NUM';
+      const fname=`Proyecto ${base}.json`;
+      await download(fname,JSON.stringify(json,null,2),'application/json');
+    }catch(e){console.error('Guardar proyecto falló:',e);alert('No se pudo guardar el proyecto.')}
+  }
+
+  /* adoptar snapshot */
+  function adoptSnapshot(snap){
+  if(!snap||typeof snap!=='object'){alert('Archivo inválido.');return}
+  const ed=document.getElementById('doc');
+  if(typeof snap.html==='string'){if(ed) ed.innerHTML=snap.html;state.doc=snap.html}
+  else if(typeof snap.doc==='string'){if(ed) ed.innerHTML=snap.doc;state.doc=snap.doc}
+  else if(snap.doc&&typeof snap.doc.html==='string'){if(ed) ed.innerHTML=snap.doc.html;state.doc=snap.doc.html}
+  const fils=Array.isArray(snap.filiaciones?.items)?snap.filiaciones.items:(Array.isArray(snap.filiaciones)?snap.filiaciones:[]);
+  const objs=Array.isArray(snap.objects?.items)?snap.objects.items:(Array.isArray(snap.objects)?snap.objects:(Array.isArray(snap.objetos)?snap.objetos:[]));
+  state.filiaciones=fils;
+  state.objects=objs;
+
+  // Meta de documentos (si viene en el JSON, lo guardamos en el estado)
+  state["Juzgado"]                = snap["Juzgado"]                || "";
+  state["Fecha de procedimiento"] = snap["Fecha de procedimiento"] || "";
+  state["Hora de procedimiento"]  = snap["Hora de procedimiento"]  || "";
+  state["Abogado nombre"]         = snap["Abogado nombre"]         || "";
+  state["Abogado colegiado"]      = snap["Abogado colegiado"]      || "";
+    
+  // Garantizar fixedId para proyectos antiguos sin este campo
+  if (Array.isArray(state.filiaciones)) {
+    state.filiaciones.forEach(ff => {
+      ff["Sexo"] = (ff["Sexo"] ?? "");
+      normalizeFiliacionTitleCaseExcept(ff);
+      if (!Number.isInteger(ff.fixedId) || ff.fixedId <= 0) {
+        ff.fixedId = nextAvailableId();
+      }
+    });
+  }
+  if(typeof window.renderFiliaciones==='function') window.renderFiliaciones();
+  try{document.getElementById('emptyHint').style.display=(state.filiaciones.length?'none':'')}catch{}
+  try{ if(typeof snap.diligenciasHtml==='string') localStorage.setItem('odac_diligencias_html',snap.diligenciasHtml) }catch{}
+  save();
+}
+
+  /* cargar proyecto */
+  function handleLoad(){ if(loadInp) loadInp.click() }
+  async function handleLoadFile(ev){
+    const f=(ev.target.files||[])[0]; if(!f) return;
+    try{const txt=await f.text();const json=JSON.parse(txt);adoptSnapshot(json)}catch(e){console.error('LOAD JSON',e);alert('JSON inválido.')}
+    ev.target.value='';
+  }
+
+  if(saveBtn){try{saveBtn.type='button'}catch{};saveBtn.onclick=null;saveBtn.addEventListener('click',ev=>{try{ev.preventDefault();ev.stopImmediatePropagation()}catch{}handleSave()},true)}
+  if(loadBtn){try{loadBtn.type='button'}catch{};loadBtn.onclick=handleLoad}
+  if(loadInp) loadInp.onchange=handleLoadFile;
+
+  /* alta rápida */
+  $('#addFBtn').onclick=()=>{const f=nuevaFiliacion();state.filiaciones.push(f);save();openedIndex=state.filiaciones.length-1;renderFiliaciones()};
+  $('#importJsonBtn').onclick=()=>$('#importJsonInput').click();
+  $('#importJsonInput').addEventListener('change',async e=>{
+    const files=e.target.files;let last=-1;
+    for(const file of files){
+      try{
+        const data=JSON.parse(await file.text());
+        const f={...nuevaFiliacion(),...data};
+        f["Tipo de documento"]=normalizeTipoDoc(f["Tipo de documento"]);
+        f["Sexo"]=(f["Sexo"]??"");
+        normalizeFiliacionTitleCaseExcept(f);
+        f.fixedId=nextAvailableId();
+        state.filiaciones.push(f);last=state.filiaciones.length-1;
+      }catch{alert(`Error al importar ${file.name}`)}
+    }
+    save();openedIndex=(last>=0?last:-1);renderFiliaciones();e.target.value="";
+  });
+
+  /* limpiar onclick redundante */
+  $('#saveProjectBtn').onclick=null;
+  $('#loadProjectBtn').onclick=()=>$('#loadProjectInput').click();
+
+  /* vincular editor */
+  $('#doc').addEventListener('input',()=>{state.doc=getDocHTML();saveDocDebounced()});
+  $('#doc').addEventListener('mouseup',saveEditorSelection);
+  $('#doc').addEventListener('keyup',saveEditorSelection);
+
+  if(dashBtn){
+    dashBtn.addEventListener('click', function(ev){
+      try{ ev.preventDefault(); ev.stopPropagation(); }catch(_){/* noop */}
+      prefixParagraphs();
+    }, false);
+  }
+})();
+</script>
+
+<script>
+/* pegado sin formato */
+(function(){
+  const ed=document.querySelector('#doc'); if(!ed) return;
+  ed.addEventListener('paste',function(e){
+    e.preventDefault();
+    const text=(e.clipboardData||window.clipboardData).getData('text/plain')||'';
+    const norm=text.replace(/\r\n?/g,'\n');
+    const sel=window.getSelection&&window.getSelection();
+    if(sel&&sel.rangeCount){
+      const r=sel.getRangeAt(0);r.deleteContents();r.insertNode(document.createTextNode(norm));r.collapse(false);
+      sel.removeAllRanges();sel.addRange(r);
+    }else if(document.execCommand){document.execCommand('insertText',false,norm)}
+  },false);
+})();
+</script>
+
+<script>
+/* botón salir → limpiar y mostrar pantalla de sesión finalizada (sin recargar) */
+(function(){
+  const exitBtn = document.getElementById('exitBtn');
+  if (!exitBtn) return;
+
+  exitBtn.onclick = () => {
+    if (!confirm('¿Salir y limpiar todos los datos del expediente actual?')) return;
+
+    // Limpieza de estado / localStorage
+    try{
+      if (typeof window.fullCleanup === 'function') {
+        window.fullCleanup();
+      } else {
+        try { localStorage.removeItem(LS_KEY); } catch (_) {}
+      }
+    }catch(_){}
+
+    // Pantalla final de sesión (si existe una común, úsala; si no, fallback local)
+    try{
+      if (typeof window.showCompaEndScreen === 'function') {
+        // Versión compartida (por ejemplo, definida en entrada_logo.js)
+        window.showCompaEndScreen();
+      } else {
+        // Fallback local: fondo negro con logo y texto
+        document.documentElement.style.background = '#000';
+        document.body.style.background = '#000';
+        document.body.innerHTML =
+          '<div style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;color:#e5e7eb;font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif;text-align:center;">'
+          + '<div>'
+          + '<div style="font-weight:900;font-size:40px;margin-bottom:8px;">COMPA·POL</div>'
+          + '<div>Sesión finalizada</div>'
+          + '</div>'
+          + '</div>';
+      }
+    }catch(_){}
+  };
+})();
+
+// BOTÓN PADRE DE GUIONES + COLETILLAS
+(() => {
+  const parent = document.getElementById('btnTools');
+  const split  = document.getElementById('toolsSplit');
+  const dash   = document.getElementById('childDash');
+  const col    = document.getElementById('childCol');
+
+  if (!parent) return;
+
+  parent.onclick = () => {
+    parent.classList.add('hidden');
+    split.classList.remove('hidden');
+    split.classList.add('show');
+  };
+
+  function closeSplit(){
+    split.classList.remove('show');
+    setTimeout(()=>{
+      split.classList.add('hidden');
+      parent.classList.remove('hidden');
+    },250);
+  }
+
+  dash.onclick = () => {
+    try{
+      if (typeof prefixParagraphs === 'function') {
+        prefixParagraphs();
+      }
+    }catch(_){}
+    closeSplit();
+  };
+
+  col.onclick = () => {
+    try{
+      if (typeof openColetillas === 'function') {
+        openColetillas();
+      } else {
+        const btn = document.getElementById('openColetillasBtn');
+        if (btn) btn.click();
+      }
+    }catch(_){}
+    closeSplit();
+  };
+
+  // Cerrar al hacer click fuera
+  document.addEventListener('click', (ev) => {
+    try{
+      const wrap = document.querySelector('.split-btn-wrap');
+      if (!wrap) return;
+      if (split.classList.contains('show') && !wrap.contains(ev.target)) {
+        closeSplit();
+      }
+    }catch(_){}
+  });
+})();
+
+</script>
+<script src="js/compa_quick_menu.js"></script>
+<div id="marca-registro">
+  103<br>
+  JBN<br>
+  486<br>
+  TFS
+</div>
+<script>
+(function(){
+  const body = document.body;
+  const THEME_KEY = 'compa_theme_mode';
+
+  const THEMES = ['verde','azul','morado','carbono'];  // ahora 4 temas
+
+  function applyTheme(mode){
+    // Quitamos todas las clases de tema conocidas
+    body.classList.remove('compa-theme-verde','compa-theme-azul','compa-theme-morado','compa-theme-carbono');
+
+    // Si no viene válido, por defecto verde
+    const cls =
+      (mode === 'azul')     ? 'compa-theme-azul'     :
+      (mode === 'morado')   ? 'compa-theme-morado'   :
+      (mode === 'carbono')  ? 'compa-theme-carbono'  :
+                              'compa-theme-verde';
+
+    body.classList.add(cls);
+  }
+
+  function ensureDefaultTheme(){
+    let mode = 'verde';
+    try{
+      const stored = localStorage.getItem(THEME_KEY);
+      if (THEMES.includes(stored)){
+        mode = stored;
+      }
+    }catch(_){}
+    applyTheme(mode);
+  }
+
+  // Toggle global: verde → azul → morado → verde, guardando preferencia
+  window.toggleCompaTheme = function(){
+    // Detectar tema actual
+    let current = 'verde';
+    if(body.classList.contains('compa-theme-azul'))         current = 'azul';
+    else if(body.classList.contains('compa-theme-morado'))  current = 'morado';
+    else if(body.classList.contains('compa-theme-carbono')) current = 'carbono';
+
+    // Calcular siguiente tema en ciclo
+    const idx = THEMES.indexOf(current);
+    const next = THEMES[(idx + 1) % THEMES.length];
+
+    try{
+      localStorage.setItem(THEME_KEY, next);
+    }catch(_){}
+
+    applyTheme(next);
+  };
+
+  ensureDefaultTheme();
+
+  // === CTRL+E → cambiar tema ===
+  window.addEventListener("keydown", e =>{
+    if(e.ctrlKey && (e.key==="e" || e.key==="E")){
+      e.preventDefault();
+      toggleCompaTheme();
+    }
+  });
+})();
+</script>
+</body>
+</html>
+</body>
+</html>

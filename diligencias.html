@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DILIGENCIAS · Compa ODAC</title>
+  <link rel="stylesheet" href="compa_theme.css" />
+  <style>
+
+    .wrap{display:grid;grid-template-columns:360px 1fr;max-width:1280px;margin:8px auto 0;gap:20px;padding:0 22px 22px;align-items:start;}
+    @media(max-width:900px){.wrap{grid-template-columns:240px 1fr}}
+    aside{
+      border-radius:20px;background:rgba(0,0,0,0);backdrop-filter:blur(10px) saturate(130%);
+      border:1px solid var(--glass-edge);box-shadow:var(--shadowA), inset 0 1px 6px var(--shine);
+      padding:12px;height:fit-content;align-self:start;
+    }
+    .aside-title{display:none;}
+    .aside-head{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      margin-bottom:16px;
+    }
+    .mode-label{
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      color:#9ca3af;
+    }
+    .mode-switch{
+      position:relative;
+      width:44px;
+      height:22px;
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,.7);
+      background:rgba(15,23,42,.9);
+      padding:0;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .mode-knob{
+      position:absolute;
+      top:2px;
+      left:2px;
+      width:18px;
+      height:18px;
+      border-radius:999px;
+      background:rgba(248,250,252,0.9);
+      box-shadow:0 0 6px rgba(56,189,248,.7);
+      transition:left .18s ease;
+    }
+    .mode-switch.on .mode-knob{
+      left:24px;
+    }
+    body[data-docs-mode="0"] .mode-label:first-of-type{
+      color:#e5e7eb;
+    }
+    body[data-docs-mode="1"] .mode-label:last-of-type{
+      color:#e5e7eb;
+    }
+    details.group{border:1px solid rgba(255,255,255,.22);border-radius:12px;margin-bottom:10px;background:rgba(0,0,0,0);backdrop-filter:blur(10px);}
+    details.group[open]{background:rgba(0,0,0,0);}
+    summary{cursor:pointer;padding:10px 12px;font-weight:700;color:#f5f7fb}
+    .group-list{display:flex;flex-direction:column;gap:8px;padding:10px 10px 12px}
+    .group-list .item{border:1px solid rgba(255,255,255,.2);border-radius:10px;padding:8px 12px;cursor:pointer;background:rgba(255,255,255,.08);transition:.2s ease;color:#e5e7eb}
+    .group-list .item:hover{background:rgba(255,255,255,.18)}
+    .group-list .item.activa{border-color:#00ff80;box-shadow:0 0 6px #00ff80}
+    main{padding:0}
+    .toolbar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;align-items:center}
+  
+    .editor{
+      border-radius:20px;
+      background: rgba(0,0,0,0);
+      backdrop-filter: blur(10px);
+      border:1px solid var(--glass-edge);
+      box-shadow:var(--shadowA), inset 0 1px 6px var(--shine);
+      min-height:0;
+      max-height:calc(100vh - 160px);
+      padding:16px 18px;
+      overflow-y:auto;
+      overflow-x:hidden;
+      user-select:text;
+      scroll-behavior:smooth;
+      color:rgb(249, 248, 246);
+    }
+
+    .editor .hl{ color:#7a905b !important; font-weight:700; }
+    .editor::-webkit-scrollbar{width:8px}
+    .editor::-webkit-scrollbar-thumb{background:rgba(255,255,255,.05);border-radius:12px}
+    .editor::-webkit-scrollbar-track{background:transparent;border-radius:12px}
+    .block > p{ margin:0 }
+    .spacer{ display:block; height:1.2em; line-height:1.2em; pointer-events:none }
+  
+ /* Estilo específico para el sidebar de Documentos (color según tema) */
+  #docSidebar .item label{
+    display:block;
+    text-align:center;
+    color: var(--label-accent);
+    font-weight:600;
+  }
+  #docSidebar .item input,
+  #docSidebar .item select{
+    width:100%;
+    text-align:center;
+    background:transparent;
+    border-radius:8px;
+    border:1px solid rgba(148,163,184,.6);
+    padding:6px 8px;
+    color:#e5e7eb;
+  }
+
+  /* Grid de plantillas dentro del panel de documentos */
+  .doc-templates-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    row-gap:45px;
+    column-gap:16px;
+    margin-top:10px;
+  }
+ 
+  .doc-template-item{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:10px 12px;
+    min-height:60px;
+    border-radius:10px;
+    background:rgba(15,23,42,.25);
+    border:1px solid rgba(148, 163, 184, 0.24);
+    font-size:13px;
+    cursor:pointer;
+    transition:background .18s ease, box-shadow .18s ease, border-color .18s ease;
+  }
+  .doc-template-item:hover{
+    background:rgba(30,64,175,.40);
+    box-shadow:0 0 12px rgba(56,189,248,.45);
+    border-color:rgba(56,189,248,.8);
+  }
+  /* Mostrar botón DESCARGAR solo en modo Documentos */
+  body[data-docs-mode="1"] #docDownloadWrap{
+    display:block !important;
+  }
+  .doc-template-item input[type="checkbox"]{
+    flex:0 0 auto;
+    transform:scale(1.05);
+    margin-top:2px;
+  }
+  .doc-template-item span{
+    flex:1;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+
+  body[data-docs-mode="1"] #btnClear,
+  body[data-docs-mode="1"] #btnCopy{
+    display:none !important;
+  }
+
+  #docSidebar .item{
+    margin-bottom:12px;
+  }
+  </style>
+</head>
+<body data-docs-mode="0" class="compa-bg-verde">
+  <header class="site-header">
+  <div class="header-inner">
+    <div class="brand" style="display:flex;gap:10px;align-items:center;color:#e0e0e0;">
+      <a href="CompaOdac.html?quickMenu=1" class="badge" style="text-decoration:none;display:inline-block;color:#e0e0e0;">COMPA • POL</a>
+      <h1 style="font-size:16px;margin:0;letter-spacing:.4px;color:#bbb"> Diligencias y Documentos</h1>
+    </div>
+    <div id="headerMeta" class="header-meta" style="display:none;"></div>
+    <nav class="top-nav" aria-label="Navegación principal" style="margin-left:auto;">
+      <button type="button" class="nav-theme-btn" onclick="if(window.toggleCompaTheme){ window.toggleCompaTheme(); }" aria-label="Cambiar tema de color">
+        🎨
+      </button>
+      <a href="CompaOdac.html" class="navlink">Comparecencia y Detenidos</a>
+    </nav>
+  </div>
+</header>
+
+  <div class="wrap" id="app">
+    <aside>
+      <div class="aside-head">
+        <span class="mode-label">Diligencias</span>
+        <button id="btnToggleDocs" type="button" class="mode-switch" aria-label="Cambiar entre diligencias y documentos">
+          <span class="mode-knob"></span>
+        </button>
+        <span class="mode-label">Documentos</span>
+      </div>
+      <div class="groups" id="groups"></div>
+
+      <!-- === Sidebar Documentos (persona / juzgado / abogado) === -->
+      <div id="docSidebar" style="margin-top:18px;padding-top:10px;border-top:1px solid rgba(255,255,255,.18);display:none;">
+
+        <div class="group-list" style="gap:14px;">
+          <div class="item" style="cursor:default;padding:6px 8px;background:rgba(0,0,0,.2);">
+            <label style="display:block;font-size:12px;margin-bottom:4px;">Persona</label>
+            <select id="docPersona" style="width:100%;border-radius:8px;padding:6px 8px;">
+              <option value="">— Selecciona persona —</option>
+            </select>
+          </div>
+
+         <div class="item" style="cursor:default;padding:6px 8px;background:rgba(0,0,0,.2);">
+           <label style="display:block;font-size:12px;margin-bottom:4px;">Juzgado</label>
+           <input id="docJuzgado" type="text" placeholder="Juzgado de Instrucción nº…"
+                  list="docJuzgadosList"
+                  style="width:100%;border-radius:8px;padding:6px 8px;margin-bottom:8px;">
+           <datalist id="docJuzgadosList"></datalist>
+
+           <div style="display:flex;gap:8px;margin-top:4px;">
+             <div style="flex:1;">
+               <label for="docFechaProc" style="display:block;font-size:12px;margin-bottom:4px;">Fecha</label>
+               <input id="docFechaProc" type="date"
+                      style="width:100%;border-radius:8px;padding:6px 8px;">
+             </div>
+             <div style="flex:1;">
+               <label for="docHoraProc" style="display:block;font-size:12px;margin-bottom:4px;">Hora</label>
+               <input id="docHoraProc" type="time"
+                      style="width:100%;border-radius:8px;padding:6px 8px;">
+             </div>
+           </div>
+         </div>
+
+          <div class="item" style="cursor:default;padding:6px 8px;background:rgba(0,0,0,.2);">
+            <label style="display:block;font-size:12px;margin-bottom:4px;">Abogado</label>
+            <input id="docAbogado" type="text" placeholder="Nombre del abogado"
+                   style="width:100%;border-radius:8px;padding:6px 8px;margin-bottom:4px;">
+            <input id="docAbogadoColegiado" type="text" placeholder="Nº colegiado"
+                   style="width:100%;border-radius:8px;padding:6px 8px;">
+          </div>
+        </div>
+      </div>
+      <!-- Botón DESCARGAR debajo del sidebar de Documentos -->
+      <div id="docDownloadWrap" style="margin-top:14px;display:none;">
+        <button id="btnDocGenerar" class="btn jungle" style="width:100%;border-radius:12px;padding:10px 0;">
+          DESCARGAR ⚡️
+        </button>
+      </div>
+    </aside>
+
+    <main>
+      <div class="toolbar">
+        <button id="btnClear" class="btn warn">❌</button>
+        <button id="btnCopy" class="btn">C</button>
+      </div>
+
+      <div id="editor" class="editor" contenteditable="true" spellcheck="false" aria-label="Editor de diligencias (bloques con 5 líneas de separación)"></div>
+
+      <!-- Panel DOCUMENTOS reutilizando el mismo recuadro que el editor -->
+      <div id="docPanel" class="editor" style="display:none;overflow-y:auto;">
+        <h2 style="margin-top:0;margin-bottom:12px;color: var(--label-accent);font-size:18px;">
+          Documentos del expediente
+        </h2>
+
+        <p style="font-size:13px;color:#e5e7eb;margin-bottom:12px;">
+          Usa la selección de <strong>Persona / Juzgado / Abogado</strong> en el lateral.
+        </p>
+        <p id="docMessage" style="font-size:12px;color:#a7f3d0;margin-bottom:12px;"></p>
+        <div id="docTemplatesList" class="doc-templates-grid">
+          <label class="doc-template-item">
+            <input type="checkbox" value="declaracion">
+            <span>Toma Declaración Detenido</span>
+          </label>
+          <label class="doc-template-item">
+            <input type="checkbox" value="oficio_dinero">
+            <span>Oficio Dinero Juzgado</span>
+          </label>
+          <label class="doc-template-item">
+            <input type="checkbox" value="oficio_adn">
+            <span>Oficio Solicitud ADN</span>
+          </label>
+          <label class="doc-template-item">
+            <input type="checkbox" value="consentimiento_adn">
+            <span>Consentimiento ADN</span>
+          </label>
+          <label class="doc-template-item">
+            <input type="checkbox" value="entrega_menor">
+            <span>Acta Entrega Menor</span>
+          </label>
+          <label class="doc-template-item">
+            <input type="checkbox" value="cita_jidl">
+            <span>Citación JIDL</span>
+          </label>
+          <label class="doc-template-item">
+            <input type="checkbox" value="cita_jrd">
+            <span>Citación JRD</span>
+          </label>
+          <label class="doc-template-item">
+            <input type="checkbox" value="ofrecimiento_esp">
+            <span>Ofrecimiento Acciones Esp</span>
+          </label>
+          <label class="doc-template-item">
+            <input type="checkbox" value="ofrecimiento_ing">
+            <span>Ofrecimiento Acciones Ing</span>
+          </label>
+          <label class="doc-template-item">
+            <input type="checkbox" value="derechos_viogen_esp">
+            <span>Derechos VIOGEN Esp</span>
+          </label>
+          <label class="doc-template-item">
+            <input type="checkbox" value="derechos_viogen_ing">
+            <span>Derechos VIOGEN Ing</span>
+          </label>
+          <label class="doc-template-item">
+            <input type="checkbox" value="comparecencia_total">
+            <span>Comparecencia Total</span>
+          </label>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Datos y reglas (como en ODAC) -->
+  <script src="js/diligencias_data.js"></script>
+  <script src="js/diligencias_rules.js"></script>
+  <script src="js/remisionguardado.js"></script>
+
+  <script>
+  // ===== Persistencia ODAC =====
+  function readDils(){
+    try{
+      if (window.Expediente && typeof window.Expediente.getDiligenciasHTML === 'function'){
+        const s = String(window.Expediente.getDiligenciasHTML() || '');
+        if (s) return s;
+      }
+    }catch(_){}
+    try{ return localStorage.getItem('odac_diligencias_html') || ''; }catch(_){ return ''; }
+  }
+  function writeDils(html){
+    try{ if(window.Expediente && typeof window.Expediente.setDiligenciasHTML==='function') window.Expediente.setDiligenciasHTML(String(html||'')); }catch(_){}
+    try{ localStorage.setItem('odac_diligencias_html', String(html||'')); }catch(_){}
+  }
+
+  function fillHeaderMeta(){
+    try{
+      const slot = document.getElementById('headerMeta');
+      if (!slot) return;
+
+      const raw = localStorage.getItem('gestor_partes_comparecencias_pc_v3');
+      if (!raw) return;
+
+      const data = JSON.parse(raw);
+      const root = (data && typeof data === 'object' && (data.expediente || data)) || {};
+      const fils =
+        Array.isArray(root.filiaciones) ? root.filiaciones :
+        (Array.isArray(root.data && root.data.filiaciones) ? root.data.filiaciones : []);
+
+      if (!fils || !fils.length) return;
+
+      const det = fils.find(f =>
+        /detenid/i.test(String(f["Condición"] || f["Condicion"] || ""))
+      );
+      if (!det) return;
+
+      const numDil =
+        det["Diligencias"] ||
+        det["Nº diligencias"] ||
+        det["Número de diligencias"] ||
+        det["Numero diligencias"] ||
+        det["n_diligencias"] ||
+        det["num_diligencias"] ||
+        "";
+
+      const delito =
+        det["Delito"] ||
+        det["DELITO"] ||
+        det["Delito principal"] ||
+        det["delito"] ||
+        "";
+
+      if (!numDil && !delito) return;
+
+      const parts = [];
+      if (numDil) parts.push("DILIGENCIAS " + String(numDil));
+      if (delito) parts.push(String(delito));
+
+      slot.textContent = parts.join(" · ");
+      slot.style.display = "inline-flex";
+    }catch(_){}
+  }
+
+
+  function syncSidebar() {
+    const blocks = Array.from(document.querySelectorAll('#editor .block'));
+    const items  = document.querySelectorAll('.group-list .item');
+
+    items.forEach(it => {
+      it.classList.remove('activa');
+
+      const id = it.dataset.id;
+      const name = (it.dataset.name || "").trim().toUpperCase();
+
+      let texto = "";
+      for (const g of window.DILIGENCIAS_GRUPOS) {
+        const f = (g.items || []).find(x => x.id === id);
+        if (f) { texto = f.texto || ""; break; }
+      }
+
+      const header = (texto.split(".-")[0] || "").toUpperCase().trim();
+      if (!header) return;
+
+      for (const b of blocks) {
+        const t = (b.innerText || "").toUpperCase();
+        if (t.includes(header) && (!name || t.includes(name))) {
+          it.classList.add('activa');
+          break;
+        }
+      }
+    });
+  }
+
+  // ===== Rules readiness =====
+  function ensureRulesReady(alertUser=false){
+    const okExpand = (typeof window.diligencias_expandItems==='function');
+    const okRender = (typeof window.diligencias_renderHTML==='function');
+    if(!okExpand || !okRender){
+      const msg = `[DILIPOL] Reglas no disponibles: expand=${okExpand}, render=${okRender}`;
+      console.error(msg);
+      if(alertUser) alert('No se han cargado las RULES (ver consola).');
+    }
+    return okExpand && okRender;
+  }
+
+  // ===== Bloques =====
+  function createBlockElement(textPlain){
+    const safe = (textPlain||'').trim();
+    const block = document.createElement('div');
+    block.className='block';
+    const p=document.createElement('p');
+    p.innerHTML = safe.replace(/\n/g,'<br>');
+    block.appendChild(p);
+    for(let i=0;i<2;i++){ const sp=document.createElement('div'); sp.className='spacer'; block.appendChild(sp); }
+    return block;
+  }
+
+  let lastEditorRange=null;
+  function isInsideEditorNode(node){ const editor=document.getElementById('editor'); return node && (node===editor || editor.contains(node)); }
+  function saveEditorSelection(){
+    const sel=window.getSelection&&window.getSelection();
+    if(sel&&sel.rangeCount){
+      const r=sel.getRangeAt(0);
+      if(isInsideEditorNode(r.startContainer)){ lastEditorRange=r.cloneRange(); }
+    }
+  }
+  function restoreEditorSelection(){
+    if(!lastEditorRange) return false;
+    const sel=window.getSelection&&window.getSelection(); if(!sel) return false;
+    sel.removeAllRanges(); sel.addRange(lastEditorRange); return true;
+  }
+  function appendHTMLToEditor(textPlain){
+    const editor = document.getElementById('editor');
+    const block  = createBlockElement(textPlain);
+
+    // Siempre añadir al final del editor
+    editor.appendChild(block);
+
+    // Hacer scroll hasta el final
+    editor.scrollTop = editor.scrollHeight;
+
+    // Actualizar resaltado
+    tintEditor();
+
+    // Colocar el cursor justo después del nuevo bloque
+    try{
+      const sel = window.getSelection();
+      if (sel) {
+        const range = document.createRange();
+        range.setStartAfter(block);
+        range.setEndAfter(block);
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
+    }catch(_){ }
+
+    // Guardar selección y persistir HTML
+    saveEditorSelection();
+    try{ writeDils(editor.innerHTML); }catch(_){ }
+  }
+
+  // ===== Detenidos desde COMPA (ODAC) =====
+  function getDetenidosExp(){
+    try{
+      // 1) Preferir estado vivo del Expediente ODAC
+      if (window.Expediente && typeof window.Expediente.getState === 'function'){
+        const st = window.Expediente.getState();
+        const fil = Array.isArray(st?.filiaciones) ? st.filiaciones : [];
+        if (fil.length){
+          const isDet = p => /detenid[oa]/i.test(String(p?.['Condición']||p?.['Condicion']||''));
+          const toTitle = s => String(s||'').toLowerCase().replace(/\b([a-záéíóúñü])/gi,(m,c)=>c.toUpperCase());
+          return fil.filter(isDet).map(p=>{
+            const full = (`${toTitle(p?.Nombre)} ${String(p?.Apellidos||'').toUpperCase()}`).replace(/\s+/g,' ').trim();
+            return { nombreCompleto: full, nombre: full, sexo: p?.Sexo };
+          });
+        }
+      }
+    }catch(_){}
+    try{
+      // 2) Snapshot actual del gestor de comparecencias (ODAC)
+      const raw = localStorage.getItem('gestor_partes_comparecencias_pc_v3');
+      if (raw){
+        const exp = JSON.parse(raw);
+        const fil = Array.isArray(exp?.filiaciones) ? exp.filiaciones : [];
+        const isDet = p => /detenid[oa]/i.test(String(p?.['Condición']||p?.['Condicion']||''));
+        const toTitle = s => String(s||'').toLowerCase().replace(/\b([a-záéíóúñü])/gi,(m,c)=>c.toUpperCase());
+        return fil.filter(isDet).map(p=>{
+          const full = (`${toTitle(p?.Nombre)} ${String(p?.Apellidos||'').toUpperCase()}`).replace(/\s+/g,' ').trim();
+          return { nombreCompleto: full, nombre: full, sexo: p?.Sexo };
+        });
+      }
+    }catch(_){}
+    return [];
+  }
+
+  // ===== Sidebar (todos los items) =====
+  function renderSidebar(){
+    const base = window.DILIGENCIAS_GRUPOS || window.DILIGENCIAS || [];
+    const groupsData = (typeof window.diligencias_expandItems==='function') ? window.diligencias_expandItems(base) : [];
+    const container = document.getElementById('groups');
+    const oldDetails = Array.from(container.querySelectorAll('details.group'));
+    const openIndex = oldDetails.findIndex(d=>d.open);
+    const oldScroll = container.scrollTop;
+    const frag = document.createDocumentFragment();
+
+    groupsData.forEach((gr, idx)=>{
+      const items = Array.isArray(gr?.items) ? gr.items : [];
+      // Si en ODAC ciertos grupos deben ocultarse, puedes filtrar aquí por nombre si lo deseas.
+
+      if (!items.length) return;
+
+      const details = document.createElement('details');
+      details.className = 'group ' + (idx%2===0 ? 'colorA':'colorB');
+      details.open = (idx===openIndex);
+      const summary = document.createElement('summary');
+      const groupTitle = (gr && (gr.name || gr.title || gr.titulo) || '').trim();
+      summary.textContent = groupTitle || 'Grupo';
+      summary.addEventListener('click',(ev)=>{
+        ev.preventDefault();
+        const all=Array.from(document.querySelectorAll('details.group'));
+        const willOpen=!details.open;
+        all.forEach(d=>d.open=false);
+        details.open=willOpen;
+      });
+
+      const list = document.createElement('div');
+      list.className = 'group-list';
+
+      items.forEach(it=>{
+        const el = document.createElement('div');
+        el.className = 'item';
+        el.dataset.id = it.id;
+        const _meta = it.__meta || it._meta || null;
+        el.dataset.det = String(_meta?.detIndex ?? 'global');
+        // Persist display name for filiaciones no detenidas
+        if (_meta && _meta.type === 'fil' && _meta.nombre) {
+          el.dataset.name = _meta.nombre;
+        }
+        el.textContent = it.corto || '—';
+        el.title = (it.texto||'').slice(0,180) + ((it.texto||'').length>180 ? '…':'');
+        el.addEventListener('mousedown',(ev)=>{
+          ev.preventDefault();
+          if(!ensureRulesReady(true)) return;
+
+          const editor = document.getElementById('editor');
+          const meta = it.__meta || it._meta || null;
+
+          const normalize = (s)=> String(s||"")
+            .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+            .replace(/\s+/g,' ').toUpperCase().trim();
+          const headerFrom = (texto)=>{
+            const s = String(texto||"");
+            const m = s.match(/^(.*?)(?:\.|\-)?\s*-\s*|^(.*?)(?:\n|$)/); // captura hasta ".-" (con espacios opcionales) o salto de línea
+            const head = m ? (m[1] || m[2] || s) : s;
+            return head.replace(/\.$/, "").trim();
+          };
+
+          function matchesBlock(txt, header, name){
+            const T = normalize(txt);
+            const H = normalize(header);
+            const candidates = new Set([H]);
+            // tolerancia de género en encabezados: DETENIDO / DETENIDA
+            candidates.add(H.replace(' DEL DETENIDO',' DE LA DETENIDA'));
+            candidates.add(H.replace(' DE LA DETENIDA',' DEL DETENIDO'));
+            // intentar también con dobles espacios colapsados
+            const more = Array.from(candidates).map(h=>h.replace(/\s+/g,' ').trim());
+            more.forEach(h=>candidates.add(h));
+
+            let headerOk = false;
+            for (const h of candidates){
+              if (h && T.includes(h)) { headerOk = true; break; }
+            }
+            if (!headerOk) return false;
+
+            if (!name) return true; // bloques globales
+            return T.includes(normalize(name));
+          }
+
+          // Updated logic for nombreRef:
+          const header = headerFrom(it.texto);
+          const detStr = el.dataset.det || 'global';
+          const detIndex = detStr==='global' ? null : parseInt(detStr,10);
+          const detenidos = getDetenidosExp();
+          let nombreRef = null;
+          if (meta && meta.type === 'det') {
+            nombreRef = (detIndex!=null && detenidos[detIndex]) ? detenidos[detIndex].nombreCompleto : null;
+          } else if (meta && meta.type === 'fil') {
+            nombreRef = meta.nombre || el.dataset.name || null;
+          }
+
+          // Toggle: si existe el bloque (mismo encabezado+nombre), eliminarlo
+          let removed = false;
+          const blocks = Array.from(editor.querySelectorAll('.block'));
+          for(const b of blocks){
+            const txt = b.innerText || b.textContent || '';
+            if(matchesBlock(txt, header, nombreRef)){
+              b.remove(); removed = true; break;
+            }
+          }
+          if(removed){
+            el.classList.remove('activa'); // quitar borde verde al deseleccionar
+            updateCounter();
+            try{ window.Expediente && window.Expediente.setDiligenciasHTML(editor.innerHTML); }catch(_){}
+            if(typeof window.dispatchEvent==='function'){
+              setTimeout(()=>{ try{ window.dispatchEvent(new Event('click')); }catch(_){ } }, 0);
+            }
+            return;
+          }
+
+          // Insertar si no estaba
+          const r=el.getBoundingClientRect(), ed=editor, t=ed.getBoundingClientRect();
+          const c=el.cloneNode(true);
+          c.style.cssText='position:fixed;left:'+r.left+'px;top:'+r.top+'px;width:'+r.width+'px;height:'+r.height+'px;z-index:2147483647;pointer-events:none;transform:translate(0,0) scale(1);opacity:1;transition:transform .7s cubic-bezier(.45,.1,.3,1),opacity .7s';
+          document.body.appendChild(c);
+          requestAnimationFrame(()=>{
+            c.style.transform='translate('+(t.left-r.left)+'px, '+(t.top-r.top)+'px) scale(.4)';
+            c.style.opacity='0';
+            setTimeout(()=>c.remove(),720);
+          });
+
+          const txt = window.diligencias_renderHTML(it, meta);
+          if((txt||'').trim()){
+            appendHTMLToEditor(txt);
+            el.classList.add('activa'); // poner borde verde al insertar
+          }
+        });
+        list.appendChild(el);
+      });
+
+      details.append(summary, list);
+      frag.appendChild(details);
+    });
+
+    container.innerHTML='';
+    container.appendChild(frag);
+    container.scrollTop = oldScroll;
+  }
+
+  function bindToolbar(){
+    document.getElementById('btnClear').addEventListener('click',()=>{
+      const editor=document.getElementById('editor');
+      editor.innerHTML='';
+      // Quitar todos los verdes del sidebar
+document.querySelectorAll('.group-list .item.activa')
+  .forEach(el => el.classList.remove('activa'));
+      tintEditor();
+      writeDils('');
+    });
+    document.getElementById('btnCopy').addEventListener('click',()=>{
+      const editor = document.getElementById('editor');
+      // Clonar contenido y quitar <mark class="pickHL"> solo para copiar
+      const tmp = document.createElement('div');
+      tmp.style.position = 'fixed';
+      tmp.style.left = '-9999px';
+      tmp.style.top = '-9999px';
+      tmp.innerHTML = (editor.innerHTML || '').replace(/<mark class="pickHL">(.*?)<\/mark>/gi,'$1');
+      document.body.appendChild(tmp);
+
+      const sel = window.getSelection();
+      const range = document.createRange();
+      range.selectNodeContents(tmp);
+      sel.removeAllRanges();
+      sel.addRange(range);
+
+      const ok = document.execCommand('copy');
+
+      sel.removeAllRanges();
+      document.body.removeChild(tmp);
+
+      alert(ok ? 'Copiado con formato en negrita.' : 'No se pudo copiar automáticamente. Prueba Ctrl+C dentro del editor.');
+    });
+  }
+  // === Meta de documentos (Juzgado / procedimiento / abogado) → snapshot ODAC ===
+  function bindDocMetaSidebar(boot){
+    const LS_KEY_ODAC = 'gestor_partes_comparecencias_pc_v3';
+    const map = {
+      docJuzgado:          "Juzgado",
+      docFechaProc:        "Fecha de procedimiento",
+      docHoraProc:         "Hora de procedimiento",
+      docAbogado:          "Abogado nombre",
+      docAbogadoColegiado: "Abogado colegiado"
+    };
+
+    function getSnap(){
+      try{
+        const raw = localStorage.getItem(LS_KEY_ODAC);
+        return raw ? JSON.parse(raw) : {};
+      }catch(_){
+        return {};
+      }
+    }
+    function saveSnap(snap){
+      try{
+        localStorage.setItem(LS_KEY_ODAC, JSON.stringify(snap || {}));
+      }catch(_){}
+    }
+
+    const snap = (boot && typeof boot === "object") ? boot : getSnap();
+
+    Object.entries(map).forEach(([id, key])=>{
+      const el = document.getElementById(id);
+      if (!el) return;
+
+      // Rehidratar valor inicial desde snapshot
+      if (key in snap){
+        el.value = snap[key] || '';
+      }
+
+      // Guardar cualquier cambio en el snapshot ODAC
+      el.addEventListener('input', ()=>{
+        const cur = getSnap();
+        cur[key] = el.value || '';
+        saveSnap(cur);
+      });
+    });
+  }
+  document.addEventListener('DOMContentLoaded',()=>{
+    try{ window.Expediente && window.Expediente.openExpediente(); }catch(_){}
+
+       // Rehidratar sidebar (tras ingerir expediente si las rules lo usan)
+    try{
+      const boot = JSON.parse(localStorage.getItem('gestor_partes_comparecencias_pc_v3') || '{}');
+      // Enlazar campos de Juzgado / procedimiento / abogado con el snapshot ODAC
+      bindDocMetaSidebar(boot || {});
+      if (typeof window.diligencias_ingestarExpediente === 'function'){
+        window.diligencias_ingestarExpediente(boot || {});
+      }
+    }catch(_){}
+
+    fillHeaderMeta();
+    renderSidebar();
+
+    const edInit = document.getElementById('editor');
+    edInit.innerHTML = readDils() || '';
+    tintEditor();
+    syncSidebar();
+
+    const editorEl=document.getElementById('editor');
+
+    editorEl.addEventListener('input', ()=> writeDils(editorEl.innerHTML));
+    editorEl.addEventListener('blur',  ()=> writeDils(editorEl.innerHTML));
+    ['keyup','mouseup','input','focus','blur'].forEach(ev=>{ editorEl.addEventListener(ev,saveEditorSelection); });
+
+    // --- PASTE: convertir pegados tipo diligencia en bloque limpio ---
+    editorEl.addEventListener('paste', (ev)=>{
+      ev.preventDefault();
+      const text = (ev.clipboardData || window.clipboardData).getData('text/plain') || '';
+
+      // Regla simple y directa: si empieza por "DILIGENCIA" y contiene ".-"
+      const first = text.trim().split('\n')[0];
+      const esDili = /^DILIGENCIA\b/i.test(first) && first.includes('.-');
+
+      if (esDili) {
+        appendHTMLToEditor(text);
+        return;
+      }
+
+      // Si no es diligencia → pegado normal de texto plano
+      document.execCommand('insertText', false, text);
+    });
+
+    bindToolbar();
+
+    if(window.Expediente && typeof window.Expediente.subscribe==='function'){
+      window.Expediente.subscribe((st)=>{
+        const ed = document.getElementById('editor');
+        if(!st || !ed) return;
+        if(!st.meta?.opened){ ed.innerHTML=''; tintEditor(); return; }
+        const next = st.diligencias && typeof st.diligencias.html==='string' ? st.diligencias.html : '';
+        if((ed.innerHTML||'') !== next){ ed.innerHTML = next; tintEditor(); }
+      });
+    }
+  });
+
+  // === Realce mínimo de encabezado y CONSTE ===
+  function tintEditor(){
+    const ed = document.getElementById('editor');
+    if(!ed) return;
+    // limpiar tinte previo en CONSTE
+    ed.innerHTML = ed.innerHTML.replace(/<span class="hl">(CONSTE Y CERTIFICO\.)<\/span>/gi,'$1');
+    // aplicar tinte a encabezados DILIGENCIA ... .-
+    ed.querySelectorAll('.block > p').forEach(p=>{
+      p.innerHTML = p.innerHTML.replace(/^\s*<span class="hl">([\s\S]*?)<\/span>/i,'$1');
+      p.innerHTML = p.innerHTML.replace(/^\s*(DILIGENCIA[\s\S]*?\.\-\s*)/i,'<span class="hl">$1<\/span>');
+    });
+    // CONSTE
+    ed.innerHTML = ed.innerHTML.replace(/CONSTE Y CERTIFICO\./gi,'<span class="hl">CONSTE Y CERTIFICO.<\/span>');
+  }
+  </script>
+  <div id="marca-registro">
+  103<br>
+  JBN<br>
+  486<br>
+  TFS
+</div>
+  <!-- QuickMenu compatible JSON loader -->
+  <input type="file" id="loadProjectInput" accept="application/json" style="display:none" />
+  <button id="loadProjectBtn" style="display:none" onclick="document.getElementById('loadProjectInput').click()"></button>
+</body>
+<script src="js/jszip.min.js"></script>
+<script src="js/FileSaver.min.js"></script>
+<script src="plantillas/plantilla_declaracion.js"></script>
+<script src="plantillas/plantilla_ofidinero.js"></script>
+<script src="plantillas/plantilla_ofiadn1.js"></script>
+<script src="plantillas/plantilla_adnconsen.js"></script>
+<script src="plantillas/plantilla_entregamenor.js"></script>
+<script src="plantillas/plantilla_jidlcita.js"></script>
+<script src="plantillas/plantilla_jrdcita.js"></script>
+<script src="plantillas/plantilla_ofrecimiento.js"></script>
+<script src="plantillas/plantilla_ofrecimientoingles.js"></script>
+<script src="plantillas/plantilla_dereviogen.js"></script>
+<script src="plantillas/plantilla_viogenrights.js"></script>
+<script src="js/documentos.js"></script>
+<script src="plantillas/plantilla_comparecencia_total.js"></script>
+<script src="js/compa_documentos.js"></script>
+<script src="js/entrada_logo"></script>
+<script>
+// Marca retorno a ODAC (misma sesión)
+(function(){
+  try{
+    const links = document.querySelectorAll('a.navlink[href="CompaOdac.html"], a.badge[href^="CompaOdac.html"]');
+    links.forEach(link=>{
+      link.addEventListener('click',()=>{
+        try{
+          sessionStorage.setItem('returning_from_diligencias','1');
+          sessionStorage.setItem('compa_skip_intro_once','1');
+        }catch(_){}
+      });
+    });
+  }catch(_){}
+})();
+</script>
+<script src="js/compa_quick_menu.js"></script>
+<script src="js/compa_quick_menu.js"></script>
+
+<script>
+(function(){
+  const body = document.body;
+  const THEME_KEY = 'compa_theme_mode';
+
+  const THEMES = ['verde','azul','morado','carbono'];  // ahora 4 temas
+
+  function applyTheme(mode){
+    // Quitamos todas las clases de tema conocidas
+    body.classList.remove('compa-theme-verde','compa-theme-azul','compa-theme-morado','compa-theme-carbono');
+
+    // Si no viene válido, por defecto verde
+    const cls =
+      (mode === 'azul')     ? 'compa-theme-azul'     :
+      (mode === 'morado')   ? 'compa-theme-morado'   :
+      (mode === 'carbono')  ? 'compa-theme-carbono'  :
+                              'compa-theme-verde';
+
+    body.classList.add(cls);
+  }
+
+  function ensureDefaultTheme(){
+    let mode = 'verde';
+    try{
+      const stored = localStorage.getItem(THEME_KEY);
+      if (THEMES.includes(stored)){
+        mode = stored;
+      }
+    }catch(_){}
+    applyTheme(mode);
+  }
+
+  // Toggle global: verde → azul → morado → verde, guardando preferencia
+  window.toggleCompaTheme = function(){
+    // Detectar tema actual
+    let current = 'verde';
+    if(body.classList.contains('compa-theme-azul'))         current = 'azul';
+    else if(body.classList.contains('compa-theme-morado'))  current = 'morado';
+    else if(body.classList.contains('compa-theme-carbono')) current = 'carbono';
+
+    // Calcular siguiente tema en ciclo
+    const idx = THEMES.indexOf(current);
+    const next = THEMES[(idx + 1) % THEMES.length];
+
+    try{
+      localStorage.setItem(THEME_KEY, next);
+    }catch(_){}
+
+    applyTheme(next);
+  };
+
+  ensureDefaultTheme();
+
+  // === CTRL+E → cambiar tema ===
+  window.addEventListener("keydown", e =>{
+    if(e.ctrlKey && (e.key==="e" || e.key==="E")){
+      e.preventDefault();
+      toggleCompaTheme();
+    }
+  });
+})();
+</script>
+</html>
+</html>

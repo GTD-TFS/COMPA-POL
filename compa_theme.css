@@ -1,0 +1,499 @@
+body:not([class*="compa-theme"]) {
+  background: var(--bg);
+}
+
+/* === Tema común COMPA + DILIS ======================= */
+
+:root{
+  /* base */
+  --bg:#020617;
+  --card: rgba(255,255,255,.06);
+  --border: rgba(255,255,255,.15);
+  --text:#eef2ff;
+  --muted:#c4d1ff;
+  --accent:#003502;
+  --accent-2:#0fd3a8;
+  --success:#39bf82;
+  --label-accent:#22c55e;
+  --danger:#ff8f8f;
+  --radius:14px;
+
+  /* cristal */
+  --ink:#f4f7ff;
+  --shine:rgba(255,255,255,.45);
+  --glass-edge: rgba(255,255,255,.25);
+  --shadowA: 0 18px 40px rgba(0,0,0,.45);
+  --shadowB: 0 6px 18px rgba(0,0,0,.30);
+}
+
+html,
+body{
+  min-height:100vh;
+}
+
+*{
+  box-sizing:border-box;
+}
+
+/* Fondo neutro por defecto */
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",Inter,system-ui,sans-serif;
+  color:#e5e7eb;
+  background:var(--bg);
+}
+
+/* Fondo verde compartido: 
+   - DILIS → class="compa-bg-verde"
+   - COMPA → class .compa-ready (ya la pone entrada_logo)
+*/
+/* ===== TEMAS CON TOGGLE (verde & azul) =================== */
+
+/* ===== TEMA VERDE · HEX HONEY / DORADO ===== */
+body.compa-theme-verde{
+  --accent:#b45309;    /* ámbar intenso */
+  --accent-2:#fbbf24;  /* dorado suave */
+  --success:#22c55e;   /* verde ok */
+  --danger:#f97316;    /* naranja alerta */
+  --label-accent:#fbbf24;
+
+  /* Fondo: patrón de hexágonos marrón-dorado + gradiente cálido */
+  background-color:#0b0905;
+  background-image:
+    /* patrón de hexágonos (grid simple) */
+    url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%2740%27%20height%3D%2740%27%20viewBox%3D%270%200%2040%2040%27%3E%3Crect%20width%3D%2740%27%20height%3D%2740%27%20fill%3D%27none%27/%3E%3Cpolygon%20points%3D%2720%2C2%2035%2C11%2035%2C29%2020%2C38%205%2C29%205%2C11%27%20fill%3D%27none%27%20stroke%3D%27%237c5c2b%27%20stroke-width%3D%271%27/%3E%3C/svg%3E"),
+    /* halos cálidos para profundidad */
+    radial-gradient(circle at 0% 0%, rgba(251,191,36,0.38), transparent 55%),
+    radial-gradient(circle at 100% 100%, rgba(217,119,6,0.32), transparent 60%),
+    /* gradiente base marrón-dorado táctico */
+    linear-gradient(135deg,#1a0e03,#6b470f,#3b2a0c);
+  background-blend-mode: overlay, soft-light, soft-light, normal;
+  background-size:40px 40px, cover, cover, cover;
+  background-attachment:fixed, fixed, fixed, fixed;
+}
+
+/* Tema AZUL / BLANCO */
+body.compa-theme-azul{
+  --accent:#0048ff;
+  --accent-2:#69b5eb;
+  --success:#6dc3ff;
+  --danger:#ffb4b4;
+  --label-accent:#6dc3ff;
+    /* Fondo: entramado isométrico frío + halos + mismo gradiente azul */
+  background-color:#010b20;
+  background-image:
+    /* patrón isométrico: rombos entrelazados tipo malla 3D, sin puntitos */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%234f9bff' stop-opacity='0.55'/%3E%3Cstop offset='1' stop-color='%231e3a8a' stop-opacity='0.35'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M0 40L40 20L80 40L40 60Z' fill='none' stroke='url(%23g)' stroke-width='0.7'/%3E%3Cpath d='M40 0L80 20L40 40L0 20Z' fill='none' stroke='%233b82f6' stroke-width='0.6' opacity='0.9'/%3E%3Cpath d='M40 40L80 60L40 80L0 60Z' fill='none' stroke='%231e40af' stroke-width='0.6' opacity='0.9'/%3E%3Cpath d='M0 40L40 0M40 0L80 40M0 40L40 80M40 80L80 40' fill='none' stroke='%234f46e5' stroke-width='0.5' opacity='0.7'/%3E%3C/svg%3E"),
+    /* halos fríos para profundidad */
+    radial-gradient(circle at 10% 0%, rgba(86,165,244,0.36), transparent 55%),
+    radial-gradient(circle at 100% 100%, rgba(37,99,235,0.42), transparent 60%),
+    /* gradiente base azul original */
+    linear-gradient(135deg,#010b20,#56a5f4);
+  background-blend-mode:overlay,soft-light,soft-light,normal;
+  background-size:80px 80px,cover,cover,cover;
+  background-attachment:fixed,fixed,fixed,fixed !important;
+}
+
+/* Cabeceras y navegación comunes */
+
+.site-header,
+.header{
+  position:sticky;
+  top:0;
+  z-index:50;
+  background:rgba(0,0,0,0.35);
+  backdrop-filter:blur(6px);
+  border-bottom:1px solid rgba(255,255,255,.08);
+  box-shadow:0 2px 20px rgba(0,0,0,.25);
+}
+
+.header-inner{
+  max-width:1400px;
+  margin:0 auto;
+  padding:12px 18px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
+  position:relative;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.badge{
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color:#0b0d19;
+  font-weight:900;
+  padding:6px 10px;
+  border-radius:8px;
+  box-shadow:0 6px 20px rgba(124,156,255,.45);
+}
+
+.brand h1,
+.title{
+  margin:0;
+  font-size:16px;
+  letter-spacing:.4px;
+  color:var(--muted);
+  font-weight:800;
+}
+
+.header-meta{
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  font-size:11px;
+  padding:4px 10px;
+  border-radius:999px;
+  border:1px solid rgba(148,163,184,.55);
+  background:rgba(15,23,42,.80);
+  color:#e5e7eb;
+  max-width:420px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  text-align:center;
+}
+
+/* Links de la barra superior */
+
+.top-nav a{
+  text-decoration:none;
+  color:var(--ink);
+  font-size:14px;
+  padding:8px 14px;
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:10px;
+  transition:.25s ease;
+  background:rgba(255,255,255,.05);
+}
+
+.top-nav a:hover{
+  background:rgba(255,255,255,.18);
+}
+
+.top-nav .nav-theme-btn{
+  margin-right:8px;
+  background:transparent;
+  color:var(--ink);
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:999px;
+  padding:6px 10px;
+  font-size:14px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  transition:background .2s ease, box-shadow .2s ease, transform .15s ease, border-color .2s ease;
+}
+
+.top-nav .nav-theme-btn:hover{
+  background:rgba(255,255,255,.10);
+  border-color:rgba(255,255,255,.35);
+  box-shadow:0 0 16px rgba(255,255,255,.35);
+  transform:translateY(-1px);
+}
+
+.top-nav .nav-theme-btn:active{
+  transform:translateY(0);
+  box-shadow:0 0 22px rgba(255,255,255,.55);
+}
+
+/* Editor tipo cristal (ambas páginas lo reutilizan) */
+
+.editor{
+  border-radius:20px;
+  border:1px solid var(--glass-edge);
+  box-shadow:var(--shadowA), inset 0 1px 6px var(--shine);
+  overflow-x:hidden;
+}
+
+.editor:focus{
+  border:1px solid var(--glass-edge) !important;
+  box-shadow:var(--shadowA), inset 0 1px 6px var(--shine) !important;
+  outline:none !important;
+}
+
+/* Resaltado de selección COMÚN (pickHL) */
+
+.pickHL{
+  background:none !important;
+  color:#e2e7ff;
+  text-decoration:underline;
+  text-decoration-color:#6fa7ff;
+  text-decoration-thickness:2px;
+}
+
+/* Marca roja de registro (ambos HTML la usan) */
+
+#marca-registro{
+  position:fixed;
+  bottom:0%;
+  right:5px;
+  font-size:8px;
+  color:rgba(255,0,0,0.5);
+  pointer-events:none;
+  user-select:none;
+  z-index:9999;
+  font-family:Arial,sans-serif;
+  text-align:center;
+  line-height:1.2;
+}
+
+/* Botones base eléctricos (comunes) */
+
+.btn{
+  cursor:pointer;
+  font-weight:800;
+  letter-spacing:.3px;
+  border-radius:999px;
+  padding:10px 16px;
+  color:#e6ebff;
+  border:none;
+  background:transparent;
+  backdrop-filter:none;
+  box-shadow:none;
+  transition:transform .16s ease,
+             box-shadow .18s ease,
+             background .18s ease;
+}
+
+.btn:hover{
+  transform:translateY(-1px);
+  background:rgba(255,255,255,.03);
+}
+
+/* Variante “peligro” mínima (usar en limpiar / salir) */
+
+.btn.warn{
+  background:transparent;
+  border:none;
+  box-shadow:
+    0 0 5px rgba(229,7,7,0.9),
+    0 0 10px rgba(236,4,4,0.75);
+}
+
+.btn.warn:hover{
+  background:rgba(255,255,255,.02);
+  box-shadow:
+    0 0 20px rgb(236,0,0),
+    0 0 30px rgba(236,8,8,0.85);
+}
+
+/* Botón de copiar circular (C) */
+
+#btnCopy,
+#copyBtn{
+  background:transparent;
+  border:none;
+  color:#ffffff;
+  box-shadow:
+    0 0 5px rgba(7,221,39,0.9),
+    0 0 10px rgba(8,236,0,0.75);
+}
+
+#btnCopy:hover,
+#copyBtn:hover{
+  background:rgba(255,255,255,.02);
+  box-shadow:
+    0 0 20px rgb(9,225,31),
+    0 0 30px rgba(6,237,44,0.85);
+}
+
+/* Para los botones C y ❌ redondos pequeños (DILIS) */
+
+#btnClear,
+#btnCopy{
+  width:30px;
+  height:30px;
+  border-radius:50%;
+  padding:0;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  font-size:16px;
+}
+
+/* Botón “jungle” reutilizable (descargar docs) */
+
+.btn.jungle{
+  background:transparent;
+  border:1px solid rgba(0,255,120,.04);
+  box-shadow:
+    0 0 6px rgba(0,255,120,.06),
+    0 0 14px rgba(0,255,120,.04),
+    inset 0 0 4px rgba(0,255,120,.4);
+  transition:box-shadow .2s ease, transform .2s ease;
+}
+
+.btn.jungle:hover{
+  box-shadow:
+    0 0 10px rgba(0,255,120,.9),
+    0 0 20px rgba(0,255,120,.7),
+    inset 0 0 6px rgba(0,255,120,.6);
+  transform:translateY(-1px);
+}
+/* Quick Menu COMPA • POL → colores según tema */
+
+body.compa-theme-verde #appQuickMenu .quick-btn{
+  background: rgba(0, 100, 107, 0.15);
+  border: 1px solid rgba(6, 165, 138, 0.3);
+  color: #eafcff;
+  box-shadow: 
+    0 0 6px rgba(1, 87, 98, 0.53),
+    0 0 14px rgba(4, 185, 170, 0.18) inset;
+  text-shadow: 0 0 6px rgba(2, 153, 138, 0.35);
+}
+
+body.compa-theme-azul #appQuickMenu .quick-btn{
+  background: rgba(0, 110, 220, 0.16);
+  border: 1px solid rgba(80, 170, 255, 0.55);
+  color: #eaf5ff;
+  box-shadow:
+    0 0 6px rgba(60, 140, 255, 0.7),
+    0 0 14px rgba(80, 170, 255, 0.25) inset;
+  text-shadow: 0 0 6px rgba(90, 180, 255, 0.55);
+}
+
+body.compa-theme-verde #appQuickMenu .quick-btn:hover{
+  background: rgba(0, 140, 150, 0.35);
+  box-shadow:
+    0 0 10px rgba(1, 120, 130, 0.75),
+    0 0 18px rgba(4, 200, 180, 0.35) inset;
+}
+
+body.compa-theme-azul #appQuickMenu .quick-btn:hover{
+  background: rgba(0, 130, 255, 0.32);
+  box-shadow:
+    0 0 10px rgba(60, 160, 255, 0.8),
+    0 0 18px rgba(90, 190, 255, 0.35) inset;
+}
+/* Mejor contraste del botón 📄⬅👤 del encabezado de filiación */
+
+body.compa-theme-verde .summary-right .btn.success.tiny{
+  background: rgba(0,200,170,0.10);
+  box-shadow:
+    inset 0 0 6px rgba(255,255,255,0.15),
+    inset 0 0 14px rgba(255,255,255,0.15);
+}
+
+body.compa-theme-azul .summary-right .btn.success.tiny{
+  background: rgba(80,170,255,0.10);
+  box-shadow:
+    inset 0 0 6px rgba(255,255,255,0.15),
+    inset 0 0 14px rgba(255,255,255,0.15);
+}
+
+/* SVG arrow recolor: trazo negro con halo para máximo contraste */
+.summary-right .btn.success.tiny .ico-arrow{
+  filter:drop-shadow(0 0 3px rgba(255,255,255,.9));
+}
+
+.summary-right .btn.success.tiny .ico-arrow path{
+  stroke:#034949;
+  stroke-width:2.4;
+}
+/* Tema MORADO / NEÓN (tercer tema) */
+body.compa-theme-morado{
+  --accent:#7c3aed;      /* púrpura intenso */
+  --accent-2:#22e6ff;   /* cian neón */
+  --success:#4ade80;    /* verde suave para OK */
+  --danger:#fb7185;     /* rosa/rojo aviso */
+  --label-accent:#5555f7;
+
+  /* Fondo: gradiente + patrón tipo rejilla muy sutil */
+  background:
+    radial-gradient(circle at 0% 0%, rgba(124,58,237,0.35), transparent 60%),
+    radial-gradient(circle at 100% 100%, rgba(34,230,255,0.35), transparent 55%),
+    linear-gradient(135deg,#050314,#140b33) fixed;
+  background-blend-mode: screen, screen, normal;
+}
+
+/* Quick Menu COMPA • POL → tema MORADO */
+
+body.compa-theme-morado #appQuickMenu .quick-btn{
+  background: rgba(40, 16, 80, 0.45);
+  border: 1px solid rgba(124, 58, 237, 0.65);
+  color: #f4f1ff;
+  box-shadow:
+    0 0 8px rgba(124, 58, 237, 0.75),
+    0 0 16px rgba(34, 230, 255, 0.28) inset;
+  text-shadow: 0 0 7px rgba(180, 160, 255, 0.6);
+}
+
+body.compa-theme-morado #appQuickMenu .quick-btn:hover{
+  background: rgba(60, 30, 120, 0.80);
+  box-shadow:
+    0 0 14px rgba(124, 58, 237, 0.95),
+    0 0 22px rgba(34, 230, 255, 0.40) inset;
+}
+
+/* Mejor contraste del botón 📄⬅👤 en tema MORADO */
+
+
+body.compa-theme-morado .summary-right .btn.success.tiny{
+  background: rgba(34,230,255,0.10);
+  box-shadow:
+    inset 0 0 6px rgba(255,255,255,0.18),
+    inset 0 0 18px rgba(124,58,237,0.45);
+  color:#e9fcff;
+}
+
+/* Tema CARBONO / HOLOGRÁFICO */
+body.compa-theme-carbono{
+  --accent:#13ffd4ad;     /* cian neón */
+  --accent-2:#115904;   /* verde */
+  --success:#4df896;    /* verde OK suave */
+  --danger:#ff6f91;     /* alerta cálida */
+  --label-accent:#4df8c5bc;
+
+  /* Fondo: textura + halos */
+  background:
+    /* fibras diagonales muy suaves */
+    repeating-linear-gradient(
+      45deg,
+      rgba(255,255,255,.04) 0 6px,
+      rgba(255,255,255,.02) 6px 12px
+    ),
+    /* halo cian arriba-izquierda */
+    radial-gradient(circle at 20% -10%, rgba(19,255,213,.25), transparent 60%),
+    /* halo violeta abajo-derecha */
+    radial-gradient(circle at 80% 110%, rgba(3, 134, 66, 0.304), transparent 55%),
+    /* base carbón */
+    #0a0c12 fixed;
+  background-blend-mode: overlay, screen, screen, normal;
+}
+
+/* Quick Menu COMPA • POL → tema CARBONO */
+
+body.compa-theme-carbono #appQuickMenu .quick-btn{
+  background: rgba(8, 13, 24, 0.7);
+  border: 1px solid rgba(19,255,213,0.55);
+  color: #e9fcff;
+  box-shadow:
+    0 0 8px rgba(19,255,213,0.75),
+    0 0 16px rgba(138,75,255,0.35) inset;
+  text-shadow: 0 0 6px rgba(138,75,255,0.65);
+}
+
+body.compa-theme-carbono #appQuickMenu .quick-btn:hover{
+  background: rgba(14, 22, 40, 0.92);
+  box-shadow:
+    0 0 14px rgba(19,255,213,0.95),
+    0 0 22px rgba(138,75,255,0.45) inset;
+}
+
+/* Mejor contraste del botón 📄⬅👤 en tema CARBONO */
+
+body.compa-theme-carbono .summary-right .btn.success.tiny{
+  background: rgba(19,255,213,0.06);
+  box-shadow:
+    inset 0 0 6px rgba(255, 255, 255, 0.085),
+    inset 0 0 18px rgba(19, 255, 212, 0.057);
+  color:#e9fcff;
+}
