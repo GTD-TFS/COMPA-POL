@@ -1,4 +1,4 @@
-const CACHE_NAME = 'compapol-github-v1';
+const CACHE_NAME = 'compapol-github-v2';
 const ASSETS = [
   './',
   './index.html',
@@ -78,3 +78,4 @@ self.addEventListener('fetch', event => {
     caches.match(event.request).then(resp => resp || fetch(event.request))
   );
 });
+
