@@ -15,14 +15,14 @@ const ASSETS = [
   './js/provincias_es.js',
   './js/municipios.js',
   './js/calles.js',
-  './Plantillas/plantilla_amarillas.js',
-  './Plantillas/plantilla_azules.js',
-  './Plantillas/plantilla_derechos_espanol.js',
-  './Plantillas/plantilla_derechos_ingles.js',
-  './Plantillas/plantilla_derechos_arabe.js',
-  './Plantillas/plantilla_derechos_italiano.js',
-  './Plantillas/plantilla_derechos_ruso.js',
-  './Plantillas/plantilla_fax.js',
+  './plantillas/plantilla_amarillas.js',
+  './plantillas/plantilla_azules.js',
+  './plantillas/plantilla_derechos_espanol.js',
+  './plantillas/plantilla_derechos_ingles.js',
+  './plantillas/plantilla_derechos_arabe.js',
+  './plantillas/plantilla_derechos_italiano.js',
+  './plantillas/plantilla_derechos_ruso.js',
+  './plantillas/plantilla_fax.js',
   './js/diligencias_data.js',
   './js/diligencias_rules.js',
   './js/remisionguardado.js',
@@ -78,5 +78,6 @@ self.addEventListener('fetch', event => {
     caches.match(event.request).then(resp => resp || fetch(event.request))
   );
 });
+
 
 
